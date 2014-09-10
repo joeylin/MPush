@@ -1,0 +1,47 @@
+{
+  "name": "nodeclub",
+  "version": "1.0.0",
+  "main": "app.js",
+  "private": true,
+  "customHost": [
+    "cnodejs.org",
+    "club.cnodejs.org"
+  ],
+  "dependencies": {
+    "body-parser": "^1.0.2",
+    "compression": "^1.0.2",
+    "connect-mongo": "^0.4.0",
+    "cookie-parser": "^1.0.1",
+    "csurf": "^1.1.0",
+    "data2xml": "0.8.0",
+    "ejs-mate": "2.0.0",
+    "eventproxy": "0.3.1",
+    "express": "~4.1.1",
+    "express-session": "^1.0.4",
+    "loader": "0.1.4",
+    "lodash": "^2.4.1",
+    "marked": "~0.3.2",
+    "memory-cache": "0.0.5",
+    "method-override": "^1.0.0",
+    "mongoose": "~2.8.0",
+    "nodemailer": "0.3.43",
+    "passport": "~0.1.17",
+    "passport-github": "~0.1.5",
+    "response-time": "^1.0.0",
+    "utility": "1.0.0",
+    "validator": "0.3.7",
+    "xss": "~0.0.9"
+  },
+  "devDependencies": {
+    "istanbul": "^0.3.0",
+    "mm": "*",
+    "mocha": "*",
+    "pedding": "*",
+    "rewire": "*",
+    "should": "*",
+    "supertest": "*"
+  },
+  "scripts": {
+    "test": "make test"
+  }
+}

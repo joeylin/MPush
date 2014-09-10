@@ -1,0 +1,30 @@
+
+<div id='content' class="col-md-8">
+  <div>
+    <div class='header'>
+      <ul class='breadcrumb'>
+        <li><a href='/'>主页</a></li>
+        <li class='active'>新消息</li>
+      </ul>
+    </div>
+    <% if (typeof(hasnot_read_messages) !== 'undefined' && hasnot_read_messages.length > 0) { %>
+    <%- partial('../message/message', { collection: hasnot_read_messages, as: 'message' }) %>
+    <% } else { %>
+    <div class='inner'>
+      <p>无新消息</p>
+    </div>
+    <% } %>
+  </div>
+  <hr>
+  <div class=''>
+    <h4 style="font-weight:700;">过往消息</h4>
+    <% if (typeof(has_read_messages) !== 'undefined' && has_read_messages.length > 0) { %>
+    <%- partial('../message/message', { collection: has_read_messages, as: 'message' }) %>
+    <% } else { %>
+    <div class='inner'>
+      <p>无消息</p>
+    </div>
+    <% } %>
+  </div>
+</div>
+<%- partial('../sidebar') %>

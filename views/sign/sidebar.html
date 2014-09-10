@@ -1,0 +1,21 @@
+<div id='sidebar' class="col-md-8">
+  <div class='well' style="color: #3c763d;font-weight:700;">
+    <h4>那些年，曾遇到的那些坑，是否还历历在目。</h4>
+    <h4>那些年，一闪而过的灵感，是否已无迹可寻。</h4>
+  </div>
+  <h4 style="font-weight:700">最新发布的记录</h4>
+  <hr>
+  <div class="trend">
+      <% if (typeof(topics) !== 'undefined' && topics.length > 0) { %>
+      <div class="inner no-padding">
+        <%- partial('../topic/show', {
+        topics: topics
+        }) %>
+      </div>
+      <% } else { %>
+      <div class="inner">
+        <p>无记录</p>
+      </div>
+      <% } %>
+  </div>
+</div>

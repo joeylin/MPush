@@ -1,0 +1,23 @@
+
+<div id='content' class="col-md-8">
+  <div class=''>
+    <div class='header'>
+      <ul class='breadcrumb'>
+        <li><a href="/user/<%=user.name%>"><%=user.name%>的主页</a></li>
+        <li class="active">创建的记录</li>
+      </ul>
+    </div>
+  </div>
+  <div>
+    <% if(typeof(topics) !== 'undefined' && topics.length > 0 ){ %>
+    <%- partial('../topic/list',
+    {topics:topics,pages:pages,current_pages:current_page,base:'/user/'+user.name+'/topics'}) %>
+    <% }else{ %>
+    <div class='inner'>
+      <p>无话题</p>
+    </div>
+    <% } %>
+  </div>
+</div>
+<%- partial('../sidebar') %>
+

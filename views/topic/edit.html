@@ -1,0 +1,170 @@
+
+<div id='content' class="col-md-8">
+  <div>
+    <div class='header'>
+      <ol class='breadcrumb'>
+        <li><a href='/'>主页</a></li>
+        <% if(typeof(action) !== 'undefined' && action == 'edit'){ %>
+        <li class='active'>编辑话题</li>
+        <% }else{ %>
+        <li class='active'>发布话题</li>
+        <% } %>
+      </ol>
+    </div>
+    <div class='inner post'>
+      <% if(typeof(edit_error) !== 'undefined' && edit_error){ %>
+      <div class="alert alert-error">
+        <a class="close" data-dismiss="alert" href="#">&times;</a>
+        <strong><%= edit_error %></strong>
+      </div>
+      <% } %>
+      <% if(typeof(error) !== 'undefined' && error){ %>
+      <div class="alert alert-error">
+        <strong><%= error %></strong>
+      </div>
+      <% }else{ %>
+      <% if (typeof(action) !== 'undefined' && action === 'edit') { %>
+      <form id='create_topic_form' action='/api/topic/<%= topic_id %>/edit' method='post' data-id="<%= topic_id %>">
+      <% } else { %>
+      <form id='create_topic_form' action='/topic/create' method='post'>
+      <% } %>
+        <fieldset>
+          <div class="form-group">
+              <label>添加标题</label>
+              <input autofocus class="form-control" id='title' name='title' type="text" placeholder="标题字数 3 字以上" value="<%= typeof(title) !== 'undefined' && title || '' %>">
+          </div>
+          <div class="form-group">
+              <label>选择标签</label>
+              <input class="form-control" type="text" placeholder="多个标签用逗号分隔" id="t_tags" value="<%= typeof(tags) !== 'undefined' && tags || '' %>">
+          </div>
+          <div class="checkbox">
+              <label>
+                <% if (isPublic) { %>
+                <input type="checkbox" id="onlyMe"> 只自己查看
+                <% } else { %>
+                <input type="checkbox" id="onlyMe" checked> 只自己查看
+                <% } %>
+              </label>
+          </div>
+
+          <div class='markdown_editor in_editor'>
+            <div class='markdown_in_editor'>
+              <div class="form-group">
+                  <textarea id="editor" class="form-control autoHeight" name='t_content' rows='20' placeholder='文章支持 Markdown 语法, 请注意标记代码'><%= typeof(content) !== 'undefined' && content || '' %></textarea>
+              </div>
+              <div class="clearfix">
+                  <span class="pull-right">
+                      <% if (typeof(action) !== 'undefined' && action === 'edit') { %>
+                      <a href="" class="btn btn-primary" id="save">保存</a>
+                      <% } else { %>
+                      <!-- <a href="" class="btn btn-default">预览</a> -->
+                      <a href="" class="btn btn-primary" id="submit">发布</a>
+                      <% } %>
+                  </span>
+              </div>
+            </div>
+            <div class='markdown_in_preview' style="display:none;">
+              <div class='preview'></div>
+              <div class='editor_buttons'>
+                <input class='span-common action_modify' type="button" value="修改">
+                <input type="submit" class='span-primary submit_btn' data-loading-text="提交中"
+                       value="提交">
+              </div>
+            </div>
+          </div>
+
+          <input type='hidden' id='topic_tags' name='topic_tags' value=''>
+          <input type='hidden' name='_csrf' value='<%= csrf %>'>
+        </fieldset>
+      </form>
+    </div>
+    <% } %>
+  </div>
+</div>
+
+<%- partial('../editor_sidebar') %>
+<div class="create-err">
+  <div class="alert alert-danger err-msg" role="alert"></div>
+</div>
+<script>
+  $('#submit').on('click', function() {
+    var title = $('#title').val();
+    var content = $('#editor').val();
+    var tags = $('#t_tags').val();
+    var isPublic = !$('#onlyMe').prop('checked');
+
+    if (!title || title.length <= 3) {
+      showError('标题字数不够！');
+    }
+    if (!content) {
+      showError('内容不能为空！');
+    }
+    if (!tags) {
+      showError('请填写标签！');
+    }
+    function showError(msg) {
+      $('.create-err .err-msg').text(msg);
+      $('.create-err').css({display:'block'});
+      setTimeout(function() {
+        $('.create-err').css({display:'none'});
+      }, 1000);
+    }
+
+    var data = {
+      title: title,
+      t_content: content,
+      topic_tags: tags,
+      isPublic: isPublic ? 1 : 0
+    };
+    $.post('/api/topic/create', data, function(data) {
+      if (data.code == 200) {
+        window.location.href = '/topic/' + data._id;
+      } else {
+        showError(data.info);
+      }
+    });
+    return false;
+  });
+  $('#save').on('click', function() {
+    var title = $('#title').val();
+    var content = $('#editor').val();
+    var tags = $('#t_tags').val();
+    var isPublic = !$('#onlyMe').prop('checked');
+
+    if (!title || title.length <= 3) {
+      showError('标题字数不够！');
+    }
+    if (!content) {
+      showError('内容不能为空！');
+    }
+    if (!tags) {
+      showError('请填写标签！');
+    }
+    function showError(msg) {
+      $('.create-err .err-msg').text(msg);
+      $('.create-err').css({display:'block'});
+      setTimeout(function() {
+        $('.create-err').css({display:'none'});
+      }, 1000);
+    }
+
+    var id = $('#create_topic_form').data('id');
+    var data = {
+      tid: id,
+      title: title,
+      t_content: content,
+      topic_tags: tags,
+      isPublic: isPublic ? 1: 0
+    };
+    
+    $.post('/api/topic/update', data, function(data) {
+      if (data.code == 200) {
+        window.location.href = '/topic/' + id;
+      } else {
+        showError(data.info);
+      }
+    });
+    return false;
+  });
+</script>
+

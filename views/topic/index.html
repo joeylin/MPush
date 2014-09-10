@@ -1,0 +1,383 @@
+
+<div class="col-md-8" id="content">
+  <div class="media full-topic" data-id="<%= topic._id %>">
+    <span class="pull-left">
+        <div class="vote-wrap">
+            <div class="vote">
+                <button class="vote-up <%= topic.hasLiked ? 'pressed': '' %>" title="赞同" style="width:48px;">
+                    <i class="vote-arrow"></i>
+                    <span class="count" style="top:18px;"><%= topic.like_count %></span>
+                </button>
+                <button class="vote-down" title="取消赞同" style="width:48px;<%= topic.hasLiked ? '': 'display:none;' %>">
+                    <i class="vote-arrow"></i>
+                </button>
+            </div>
+        </div>
+    </span>
+    <div class="media-body">
+      <h4 style="margin-bottom:5px;margin-top:0;font-weight:700;"><%= topic.title %></h4>
+      <div style="margin-bottom:15px;color:#999;">
+          作者: <a href="user/<%= topic.author.name %>"><%= topic.author.name %></a>
+           标签: <span class="" style="font-size:12px;"><%= topic.tags %></span>
+          <% if (topic.friendly_create_at != topic.friendly_update_at) { %>
+          <span>
+            最后一次编辑是 <%= topic.friendly_update_at %>
+          </span>
+          <% } %>
+      </div>
+      <div class="page-content">
+          <%- markdown(topic.content) %>
+      </div>
+      <div class="media-info clearfix">
+          <span class="date"><%= topic.friendly_create_at %></span>
+          <span> 讨论(<%= topic.reply_count %>)</span>
+          <span class="pull-right">
+            <% if (typeof(current_user) !== 'undefined' && current_user._id == topic.author_id) { %>
+            <a href='/topic/<%= topic._id %>/edit' class="edit btn btn-success btn-sm" style="margin-left:10px;">
+              编辑
+            </a>
+            <% } %>
+          </span>
+
+          <!-- 微博分享 -->
+          <a href="" class="pull-right btn btn-success btn-sm">
+            <span class='span-success' id='share_weibo_btn'
+            onclick="((function(s,d,e,r,l,p,t,z,c){var f='http://v.t.sina.com.cn/share/share.php?appkey=<%= config.weibo_key %>',u=z||d.location,p=['&url=',e(u),'&title=',e(t||d.title),'&source=',e(r),'&sourceUrl=',e(l),'&content=',c||'gb2312','&pic=',e(p||'')].join('');function a(){if(!window.open([f,p].join(''),'mb',['toolbar=0,status=0,resizable=1,width=440,height=430,left=',(s.width-440)/2,',top=',(s.height-430)/2].join('')))u.href=[f,p].join('');};if(/Firefox/.test(navigator.userAgent))setTimeout(a,0);else a();})(screen,document,encodeURIComponent,'','','','分享来自<%= config.name %>的话题：<%= topic.title %>','',''));"
+              >分享到微博</span>
+          </a> 
+          <!-- 收藏 -->
+          <% if (typeof(current_user) !== 'undefined') { %>
+          <% if (!topic.in_collection) { %>
+          <a href="" class='pull-right btn btn-success btn-sm' id='collect_btn' action='collect' style="margin-right:10px;">加入收藏</a>
+          <% } else { %>
+          <a href="" class='pull-right btn btn-default btn-sm' id='collect_btn' action='de_collect' style="margin-right:10px;">取消收藏</a>
+          <% } %>
+          <% } %>
+      </div>
+    </div>
+  </div>
+  <hr>
+  <div class="reply-container" style="margin-left:17px;">
+    <% if (topic.replies && topic.replies.length > 0) { %>
+    <div class="reply-list">
+      <%- partial('../reply/reply', topic.replies) %>
+    </div>
+    <% } %>
+    <% if (current_user) { %>
+    <div class="reply-editor page-reply" id="page_reply_container">
+        <h4 style="margin-top:20px;" class="clearfix"><span class=""><%= current_user.name %></span> 回复记录: </h4>
+        <textarea id="page-editor" class="form-control autoHeight" placeholder="添加回复"></textarea>
+        <div class="clearfix" style="margin-top:10px;">
+            <a href="" class="btn btn-primary pull-right btn-sm reply_submit">回复</a>
+        </div>
+    </div>
+    <% } %>
+  </div>
+    
+</div>
+
+<div id='sidebar' class="col-md-4">
+  <div>
+    <div class='inner'>
+      <%- partial('../user/card', { object: topic.author, as: 'user' }) %>
+    </div>
+  </div>
+  <hr>
+
+  <div>
+    <div class='header'>
+      <span class='col_fade'>作者其它记录</span>
+    </div>
+    <div class='inner'>
+      <% if (typeof(author_other_topics) !== 'undefined' && author_other_topics.length > 0) { %>
+      <ul class='unstyled'>
+        <%- partial('../topic/small', { collection: author_other_topics, as: 'topic' }) %>
+      </ul>
+      <% } else { %>
+      <p>无</p>
+      <% } %>
+    </div>
+  </div>
+  <hr>
+
+  <div>
+    <div class='header'>
+      <span class='col_fade'>无人讨论的记录</span>
+    </div>
+    <div class='inner'>
+      <% if (typeof(no_reply_topics) !== 'undefined' && no_reply_topics.length > 0) { %>
+      <ul class='unstyled'>
+        <%- partial('../topic/small', { collection: no_reply_topics, as: 'topic' }) %>
+      </ul>
+      <% } else { %>
+      <p>无</p>
+      <% } %>
+    </div>
+  </div>
+</div>
+
+<% if (typeof(current_user) !== 'undefined' && typeof(topic) !== 'undefined') { %>
+
+<script>
+  $(document).ready(function () {
+
+    $('#content').on('click', '.reply2_btn', function (event) {
+      var $btn = $(event.currentTarget);
+      var parent = $btn.closest('.reply_area');
+      var editorWrap = parent.find('.reply2_form');
+      parent.find('.reply2_area').prepend(editorWrap);
+      var textarea = editorWrap.find('textarea.editor');
+      var user = $btn.closest('.author_content').find('.reply_author').text().trim();
+
+      editorWrap.show('fast', function () {
+        textarea.focus();
+        if (textarea.val().indexOf('@' + user) < 0) {
+          textarea.val('@' + user + ' ');
+        }
+      });
+    });
+
+    $('#content').on('click', '.reply2_at_btn', function (event) {
+      var $btn = $(event.currentTarget);
+      var editorWrap = $btn.closest('.reply2_area').find('.reply2_form');
+      $btn.closest('.reply2_item').after(editorWrap);
+      var textarea = editorWrap.find('textarea.editor');
+      var user = $btn.closest('.reply2_item').find('.reply_author').text().trim();
+
+      editorWrap.show('fast', function () {
+        textarea.focus();
+        if (textarea.val().indexOf('@' + user) < 0) {
+          textarea.val('@' + user + ' ');
+        }
+      });
+    });
+
+    $('#content').on('click', '.delete_reply_btn, .delete_reply2_btn', function (event) {
+      var $me = $(event.currentTarget);
+      if (confirm('确定要删除此回复吗？')) {
+        var $media = $me.closest('.media')
+        var reply_id = $media.data('id');
+        var data = {
+          reply_id: reply_id,
+          _csrf: "<%- csrf %>"
+        };
+        $.post('/reply/' + reply_id + '/delete', data, function (data) {
+          if (data.status === 'success') {
+            var $hr = $media.next();
+            $media.remove();
+            $hr.remove();
+          }
+        }, 'json');
+      }
+      return false;
+    });
+
+    $('.delete_topic_btn').click(function () {
+      var topicId = $(this).closest('.media').data('id');
+      if (topicId && confirm('确定要删除此话题吗？')) {
+        $.post('/topic/' + topicId + '/delete', { _csrf: $('#_csrf').val() }, function (result) {
+          if (!result.success) {
+            alert(result.message);
+          } else {
+            location.href = '/';
+          }
+        });
+      }
+      return false;
+    });
+
+    $('textarea.editor').keydown(function (event) {
+      if (event.keyCode == 13 && (event.ctrlKey || event.metaKey)) {
+        event.preventDefault()
+        $(this).closest('form').submit()
+      }
+    });
+    // 获取所有回复者name
+    var allNames = $('.reply_author').map(function (idx, ele) {
+      return $(ele).text().trim();
+    }).toArray();
+    allNames = _.uniq(allNames);
+    // END 获取所有回复者name
+
+    $('textarea.editor').atwho({
+      at: '@',
+      data: allNames
+    });
+
+    // 点赞
+    $('.up_btn').click(function (e) {
+      var $this = $(this);
+      if ($this.hasClass('uped')) {
+        return false;
+      }
+      var replyId = $this.closest('.media').data('id');
+      $.ajax({
+        url: '/reply/' + replyId + '/up',
+        method: 'POST',
+      }).done(function (data) {
+        if (data.success) {
+          var $upCount = $this.closest('.media').find('.up-count');
+          $upCount.text((+$upCount.text() || 0) + 1);
+          $this.addClass('uped');
+          $this.removeClass('up_btn');
+          $this.text('已赞 ');
+        } else {
+          alert('重复投票。');
+        }
+      });
+    });
+    // END 点赞
+
+    // inline-reply
+    $('.inline-reply-btn').on('click', function() {
+        var user = $(this).closest('.media').find('.reply-title a').text().trim();
+        if ($(this).data('loaded')) {
+          var $container = $(this).closest('.media').find('.inline-reply');
+          if ($(this).data('opened')) {
+            $container.css({display:'none'});
+            $(this).data('opened', false);
+          } else {
+            $container.css({display:'block'});
+            $(this).data('opened', true);
+            $container.find('textarea').focus().val('@' + user + ' ');
+          }
+          return false;
+        }
+        var tpl = '<div class="inline-reply">' +
+                      '<textarea class="autoHeight form-control"></textarea>' +
+                      '<div class="op">' +
+                          '<a href="" class="send btn btn-primary btn-sm">回复</a>' +
+                          '<a href="" class="cancel btn btn-default btn-sm">取消</a>' +
+                      '</div>' +
+                  '</div>';
+        var $wrap = $(this).closest('.media');
+        var $tpl = $(tpl);
+        var id = $wrap.data('id');
+        if (!id) {
+          return false;
+        }
+        $tpl.appendTo($wrap.find('.media-body'));
+        $tpl.find('textarea').flexText();
+        $tpl.find('textarea').focus().val('@' + user + ' ');
+        $tpl.find('.send').on('click', function() {
+          var content = $tpl.find('textarea').val();
+          var topic_id = '<%= topic._id %>';
+          if (!content) {
+            return false;
+          }
+          var data = {
+            reply_id: id,
+            r2_content: content
+          };
+          // ajax
+          $.post('/api/topic/' + topic_id + '/ajaxReply2', data, function(data) {
+            if (data.code == 200) {
+              window.location.reload();
+            }
+          });
+          return false;
+        });
+        var self = this;
+        $tpl.find('.cancel').on('click', function() {
+          $tpl.css({display:'none'});
+          $(self).data('opened', false);
+          return false;
+        });
+        $(this).data('opened', true);
+        $(this).data('loaded', true);
+    });
+
+    // reply
+    $('#page_reply_container .reply_submit').on('click', function() {
+      var content = $('#page_reply_container').find('textarea').val();
+      var topic_id = '<%= topic._id %>';
+      if (!content) {
+        return false;
+      }
+      var data = {
+        r_content: content
+      };
+      // ajax
+      $.post('/api/topic/' + topic_id + '/ajaxReply', data, function(data) {
+        if (data.code == 200) {
+          window.location.reload();
+        }
+      });
+      return false;
+    });
+
+    // 收藏
+    $('#collect_btn').click(function () {
+      var $me = $(this);
+      var action = $me.attr('action');
+      var data = {
+        topic_id: '<%= topic._id %>',
+        _csrf: '<%= csrf %>'
+      };
+      $.post('/topic/' + action, data, function (data) {
+        if (data.status === 'success') {
+          if (action == 'collect') {
+            $me.text('取消收藏');
+            $me.attr('action', 'de_collect');
+            $me.removeClass('btn-success').addClass('btn-default');
+          } else {
+            $me.text('加入收藏');
+            $me.attr('action', 'collect');
+            $me.removeClass('btn-default').addClass('btn-success');
+          }
+        }
+      }, 'json');
+      return false;
+    });
+
+    // 主题点赞
+    $('.full-topic').on('click', '.vote-up' , function() {
+      if ($(this).hasClass('pressed')) {
+        return false;
+      }
+      var $media = $(this).closest('.media');
+      var id = $media.data('id');
+      var $down = $media.find('.vote-wrap .vote-down');
+      var $likeCount = $media.find('.vote-up .count');
+      var data = {
+        topic_id: id
+      };
+      var self = this;
+      $.post('/api/topic/like', data, function(data) {
+        if (data.code == 200) {
+          $(self).addClass('pressed');
+          $down.removeClass('pressed');
+          $down.css({display:'inline-block'});
+          var count = (parseInt($likeCount.text(), 10) + 1) || 0;
+          $likeCount.text(count);
+        }
+      });
+      return false;
+    });
+    $('.full-topic').on('click', '.vote-down', function() {
+      if ($(this).hasClass('pressed')) {
+        return false;
+      }
+      var $media = $(this).closest('.media');
+      var id = $media.data('id');
+      var $up = $media.find('.vote-wrap .vote-up');
+      var $likeCount = $up.find('.count');
+      var data = {
+        topic_id: id
+      };
+      var self = this;
+      $.post('/api/topic/unlike', data, function(data) {
+        if (data.code == 200) {
+          $up.removeClass('pressed');
+          $(self).addClass('pressed');
+          var count = (parseInt($likeCount.text(), 10) - 1) || 0;
+          $likeCount.text(count);
+        }
+      });
+      return false;
+    });
+
+  });
+
+</script>
+<% } %>

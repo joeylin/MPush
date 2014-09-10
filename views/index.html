@@ -1,0 +1,236 @@
+
+<div class="col-md-8" id="content">
+    <div class="header">
+        <h4 class="clearfix" style="margin-top:0px;">
+            快速记录 :
+            <div class="form-group input-topic">
+                <input id="fTag" type="text" class="form-control" placeholder="选择标签(最多3个), 逗号分隔">
+            </div>
+        </h4> 
+        <textarea id="fContent" class="form-control autoHeight" rows="3" style="margin-bottom:10px;"></textarea>
+        <div class="clearfix">
+            <span class="pull-left">
+                <label>
+                  <input type="checkbox" id="fIsPublic"> 只自己查看
+                </label>
+            </span>
+            <span class="pull-right">
+                <a href='/topic/create' style="margin-right:5px;">完整格式</a>
+                <a href="" class="btn btn-primary btn-sm" id="fSubmit">记录</a>
+            </span>
+        </div>
+        <div class="showError" id="showError">
+          <div class="alert alert-danger err-msg" role="alert">出错了！</div>
+        </div>
+    </div>
+    <h4>最新动态</h4>
+    <hr>
+    <div class="trend" id="record-container">
+        <% if (typeof(topics) !== 'undefined' && topics.length > 0) { %>
+        <div class="inner no-padding">
+          <%- partial('topic/list', {
+          topics: topics,
+          pages: pages,
+          current_page: current_page,
+          base: '/'
+          }) %>
+        </div>
+        <% } else { %>
+        <div class="inner">
+          <p>无话题</p>
+        </div>
+        <% } %>
+    </div>
+</div>
+
+<%- partial('sidebar') %>
+<script>
+  window.USER = <%- JSON.stringify(current_user) %>
+</script>
+<script>
+  $('#fSubmit').on('click', function() {
+    var data = {
+      topic_tags: $('#fTag').val(),
+      t_content: $('#fContent').val(),
+      isPublic: $('#fIsPublic').prop('checked')? 0 : 1
+    };
+    $.ajax({
+      url: '/api/topic/create',
+      type: 'post',
+      data: data,
+      success: function(data) {
+        if (data.code == 200) {
+          window.location.href = '/topic/' + data._id;
+        } else {
+          showError(data.info);
+        }
+      },
+      error: function(err) {
+        showError(err.msg);
+      }
+    });
+    function showError(msg) {
+      $('#showError .err-msg').text(msg);
+      $('#showError').css({display:'block'});
+      setTimeout(function() {
+        $('#showError').css({display:'none'});
+      }, 1000);
+    };
+    return false;
+  });
+</script>
+<script>
+  $('#record-container').on('click',  '.show-all', function() {
+    var $media = $(this).closest('.media');
+    var $intro = $media.find('.media-content-intro');
+    var $content = $media.find('.media-content');
+    var $closeBtn = $media.find('.close-content');
+
+    $intro.css({display:'none'});
+    $content.css({display:'block'});
+    $closeBtn.css({display:'block'});
+
+    return false;
+  });
+  $('#record-container').on('click', '.close-content', function() {
+    var $media = $(this).closest('.media');
+    var $intro = $media.find('.media-content-intro');
+    var $content = $media.find('.media-content');
+
+    $intro.css({display:'block'});
+    $content.css({display:'none'});
+    $(this).css({display:'none'});
+    return false;
+  });
+  $('#record-container').on('click', '.like', function() {
+    var $media = $(this).closest('.media');
+    var id = $media.data('id');
+    var $liked = $media.find('.hasLiked');
+    var $likeCount = $media.find('.vote .count');
+    var data = {
+      topic_id: id
+    };
+    var self = this;
+    $.post('/api/topic/like', data, function(data) {
+      if (data.code == 200) {
+        $(self).css({display:'none'});
+        $liked.css({display:'inline-block'});
+        var count = (parseInt($likeCount.text(), 10) + 1) || 0;
+        $likeCount.text(count);
+      }
+    });
+  });
+  $('#record-container').on('click', '.hasLiked', function() {
+    var $media = $(this).closest('.media');
+    var id = $media.data('id');
+    var $like = $media.find('.like');
+    var $likeCount = $media.find('.vote .count');
+    var data = {
+      topic_id: id
+    };
+    var self = this;
+    $.post('/api/topic/unlike', data, function(data) {
+      if (data.code == 200) {
+        $(self).css({display:'none'});
+        $like.css({display:'inline-block'});
+        var count = (parseInt($likeCount.text(), 10) - 1) || 0;
+        $likeCount.text(count);
+      }
+    });
+  });
+  $('#record-container').on('click', '.collect', function() {
+      var $me = $(this);
+      var id = $me.closest('.media').data('id');
+      var action = $me.attr('action');
+      var data = {
+        topic_id: id
+      };
+      $.post('/topic/' + action, data, function (data) {
+        if (data.status === 'success') {
+          if (action == 'collect') {
+            $me.text('取消收藏');
+            $me.attr('action', 'de_collect');
+          } else {
+            $me.text('收藏');
+            $me.attr('action', 'collect');
+          }
+          $me.toggleClass('span-success');
+        }
+      }, 'json');
+  });
+  $('#record-container').on('click', '.forward', function() {
+      var $me = $(this);
+      if ($me.data('done')) {
+        return false;
+      } else {
+        $me.data('done', true);
+      }
+      var id = $me.closest('.media').data('id');
+      var data = {
+        topic_id: id
+      };
+      $.post('/api/topic/forward', data, function (data) {
+        if (data.code == 200) {
+          $me.text('已转');
+        } else {
+          $me.data('done', false);
+        }
+      }, 'json');
+      return false;
+  });
+  $('#record-container').on('click', '.share', function() {
+
+  });
+</script>
+
+<script id="tpl-comment" type="x-tmpl-mustache">
+    <div class="media" data-id="__id__">
+        <a href="/profile/__userName__" class="pull-left">
+            <img src="__img__" style="width:34px;height:34px;">
+        </a>
+        <div class="media-body media-body-comment">
+            <div class="title">
+            <a href="/user/__userName__">__userName__</a>
+            __reply__
+            </div>
+            <div class="reply-content">__content__</div>
+            <div class="media-info clearfix">
+                <span class="date">__date__</span>
+                <span class="reply_like __likeClass__"> __likeText__</span>
+                <span class="h-inline-reply-btn"> 回复</span>
+                <span class="pull-right"><span class="like-count">__likeCount__</span> 赞</span>
+            </div>
+        </div>
+    </div>
+</script>
+<script id="tpl-reply" type="x-tmpl-mustache">
+    <div class="h-reply-box">
+        <span class="reply-arrow"></span>
+        <div class="h-reply-content"></div>
+        <div class="reply-content-all text-center"><a href="">显示全部评论</a></div> 
+        <div class="reply-footer">
+            <textarea class="autoHeight form-control" placeholder="发表评论"></textarea>
+            <div class="h-reply-op clearfix" style="display:none;">
+                <span class="pull-right">
+                    <a href="" class="btn btn-default btn-sm reply-cancel" style="margin:0 5px;">取消</a>
+                    <a href="" class="btn btn-primary btn-sm reply-send">回复</a>
+                </span>
+            </div>
+        </div>
+        <div class="reply-loading"><span class="loading-icon"></span>正在加载中...</div>
+    </div>
+</script>
+<script id="tpl-inline-reply" type="x-tmpl-mustache">
+    <div class="inline-reply-container"> 
+        <textarea class="autoHeight form-control inline-text"></textarea> 
+        <div class="h-inline-reply-op clearfix"> 
+            <span class="pull-right"> 
+                <a href="" class="btn btn-default btn-sm inline-cancel" style="margin:0 5px;">取消</a> 
+                <a href="" class="btn btn-primary btn-sm inline-send">回复</a> 
+            </span> 
+        </div> 
+        <div class="err-msg"></div>
+    </div>
+</script>
+
+

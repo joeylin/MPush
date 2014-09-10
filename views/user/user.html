@@ -1,0 +1,15 @@
+<div class='user'>
+  <div class="media">
+    <a href="/user/<%= user.name %>" class="pull-left">
+      <img class='user_avatar' src="<%= user.avatar_url %>" title="<%= user.name %>" style="width:48px;height:48px;" />
+    </a>
+    <div class="media-body">
+      <div class="title"><a href="/user/<%= user.name %>"><%= user.name %></a></div>
+      <div>
+        <span class='col_fade'><%= user.follower_count %> 粉丝 </span>
+        <span class='col_fade'><%= user.following_count %> 关注 </span>
+      </div>
+    </div>
+  </div>
+  <hr class="hr-sm">
+</div>

@@ -1,0 +1,345 @@
+body, .label {
+	font-family: 微軟正黑體, 'Open Sans', sans-serif;
+}
+.wrap {
+	max-width: 960px!important;
+	margin-right: auto;
+	margin-left: auto;
+}
+.header {
+	margin-bottom: 20px;
+	position: relative;
+}
+.header h4 {
+	line-height: 34px;
+}
+.header .input-topic {
+	width: 280px;
+	margin-bottom: 0px;
+	float: right
+}
+.header .showError {
+	position: absolute;
+	top: 50%;
+	margin-top: -14px;
+	width: 100%;
+	text-align: center;
+	display: none;
+}
+.header .showError .err-msg {
+	display: inline-block;
+	padding: 4px 15px;
+}
+
+.media-body .record-title {
+	margin-bottom: 5px;
+	font-size: 15px;
+}
+.record-title .record-user {
+	color:#333;
+	font-weight:700;
+}
+.media-body .title {
+	margin-bottom: 5px;
+	color: #99a1a6;
+}
+.media .pull-left img {
+	border-radius: 5px;
+}
+.media .media-content,
+.media .media-content-intro,
+.media .reply-content {
+	margin-bottom: 10px;
+}
+.media .media-content img {
+	float: left;
+	max-height: 111px;
+	max-width: 180px;
+	margin: 4px 10px 5px 0;
+	border-radius: 4px;
+}
+.media .date {
+	margin-right: 5px;
+}
+.media-info {
+	color: #99a1a6;
+}
+.loading {
+	background-color:#dff0d8;
+	padding:5px;
+	margin-top: 20px;
+	cursor: pointer;
+}
+
+.hot ul,
+.topic ul {
+	margin: 0;
+	list-style: none;
+	padding: 0;
+}
+.hot li {
+	border-bottom: 1px dashed #DDD;
+	margin-bottom: 5px;
+	padding-bottom: 5px; 
+}
+.vote button {
+	display: block;
+	color: #698ebf;
+	height: 24px;
+	line-height: 24px;
+	width: 40px;
+	border-radius: 3px;
+	border: 0;
+	cursor: pointer;
+	background: #eff6fa;
+	font-weight: 700;
+	font-weight: 500;
+	position: relative;
+}
+.vote .vote-up {
+	height: 44px;
+}
+.vote .vote-down {
+	margin: 5px 0 0 0;
+}
+.vote .vote-arrow {
+	display: inline-block;
+	width: 0;
+	height: 0;
+	border: 6px solid transparent;
+	font-size: 0;
+	background-image: none;
+}
+.vote .vote-up .vote-arrow {
+	border-top-width: 0;
+	border-bottom-color: #698ebf;
+	border-top-style: solid;
+	background-position: 0 -229px;
+	position: relative;
+	top: -9px;
+}
+.vote .vote-up.pressed .vote-arrow {
+	border-bottom-color: #fff;
+}
+.vote .vote-down.pressed .vote-arrow {
+	border-top-color: #fff;
+}
+.vote .vote-down .vote-arrow {
+	border-bottom-width: 0;
+	border-top-color: #698ebf;
+	background-position: -21px -229px;
+}
+.vote button.pressed {
+	background-color: #698ebf;
+}
+.vote .count {
+	position: absolute;
+	width: 100%;
+	top: 0px;
+	left: 0;
+}
+.vote .vote-up.pressed .count {
+	color: #fff;
+}
+.vote-full, .more-close {
+	display: none;
+}
+
+/* add.html reset simditor.css */
+.simditor .simditor-toolbar > ul > li > .toolbar-item {
+	width: 30px;
+}
+.simditor .simditor-popover.image-popover .btn-upload {
+	top: 5px;
+}
+
+/* records.html reply-container */
+.reply-editor .simditor .simditor-body {
+	min-height: 100px;
+	padding: 15px;
+	font-size: 14px;
+}
+.relate-list li {
+	margin-bottom: 10px;
+}
+ul.unstyled {
+	margin: 0;
+	padding: 0;
+	list-style: none;
+}
+.inline-reply {
+	margin-top: 10px;
+}
+.inline-reply .send {
+	margin-right: 5px; 
+}
+.inline-reply-btn {
+	cursor: pointer;
+}
+
+/* profile.html */
+.box {
+	padding: 20px;
+	border: 1px solid #ddd;
+	border-radius: 4px;
+	margin-bottom: 20px;
+}
+.card-list {
+	margin-bottom: 8px;
+}
+.hr-sm {
+	margin: 10px 0;
+}
+
+/* index.html h-reply-box */
+.h-reply-box {
+	padding: 0;
+	border-radius: 4px;
+	border: 1px solid #eee;
+	margin-top: 10px;
+	position: relative;
+	margin-right: 15px;
+}
+.h-reply-content {
+	margin-top: 15px;
+}
+.h-reply-content > .media,
+.h-reply-content > hr {
+	margin-left: 10px;
+	margin-right: 10px;
+}
+.h-reply-box .media-info {
+	font-size: 13px;
+}
+.h-reply-box .media-body .title,
+.h-reply-box .media-body .reply-content {
+	margin-bottom: 0;
+}
+.h-reply-box .reply-content-all {
+	margin-top: 20px;
+	padding: 10px 10px 0 10px;
+	border-top: 1px solid #eee;
+	cursor: pointer;
+	display: none;
+}
+.h-reply-box .reply-arrow {
+	position: absolute;
+	display: block;
+	width: 0;
+	height: 0;
+	border-color: transparent;
+	border-style: solid;
+	border-width: 8px;
+	left: 213px;
+	margin-left: -7px;
+	border-top-width: 0;
+	border-bottom-color: rgba(0,0,0,.1);
+	top: -8px;
+}
+.h-reply-box .reply-loading {
+	padding: 15px;
+	text-align: center;
+	display: none;
+}
+.h-reply-box .reply-arrow:after {
+	position: absolute;
+	display: block;
+	width: 0;
+	height: 0;
+	border-color: transparent;
+	border-style: solid;
+	border-width: 7px;
+	content: " ";
+	top: 1px;
+	margin-left: -7px;
+	border-top-width: 0;
+	border-bottom-color: #fff;
+}
+.reply-footer textarea, 
+.reply-footer .flex-text-wrap pre {
+	min-height: 34px;
+	margin-bottom: 0;
+}
+.inline-reply-container {
+	margin-top: 10px;
+	position: relative;
+}
+.inline-reply-container .err-msg {
+	position: absolute;
+	top: 7px;
+	left: 0;
+	width: 100%;
+	text-align: center;
+	color: red;
+	display: none;
+}
+.inline-reply-container textarea,
+.inline-reply-container .flex-text-wrap pre {
+	min-height: 34px;
+}
+.reply-footer {
+	padding: 15px;
+	background-color: #f8f8f8;
+	border-top: 1px solid #eee;
+	margin-top: 10px;
+}
+.reply-footer .h-reply-op {
+	margin-top: 10px;
+}
+.share, .collect, .like, .more-close, .forward,
+.hasLiked, .h-reply-btn, .h-inline-reply-btn {
+	cursor: pointer;
+}
+
+/* index.html pagination */
+.pa-wrap {
+	display: none;
+}
+
+/* index.html goup */
+.goup-container {
+	opacity: 0.8;
+	position: fixed;
+	width: 40px;
+	height: 40px;
+	cursor: pointer;
+	bottom: 10px;
+	right: 20px;
+	border-top-left-radius: 10px;
+	border-top-right-radius: 10px;
+	border-bottom-right-radius: 10px;
+	border-bottom-left-radius: 10px;
+	background: rgb(221, 221, 221);
+}
+.goup-container:hover {
+	opacity: 1;
+}
+.goup-arrow {
+	width: 0px;
+	height: 0px;
+	margin: 0px auto;
+	padding-top: 13px;
+	border-style: solid;
+	border-width: 0px 10px 10px;
+	border-color: transparent transparent rgb(187, 187, 187);
+}
+@media (min-width: 992px) {
+	.goup-container {
+		right: 3%!important;
+	}
+}
+
+/* user-card */
+.user-card .user-data-item {
+	width:50px;
+	padding:0 10px; 
+	border-right:1px solid #999; 
+}
+
+/* index.html */
+.close-content {
+	display: none;
+	cursor: pointer;
+}
+
+

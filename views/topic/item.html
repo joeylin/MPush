@@ -1,0 +1,55 @@
+
+<div class="media trend-item" data-id="<%= topic._id %>" data-realId="<%= topic.real_id %>">
+    <span class="pull-left">
+        <a href="/user/<%= topic.author.name %>">
+          <img src="<%= topic.author.avatar_url %>" title="<%= topic.author.name %>" style="width:40px;height:40px;" />
+        </a>
+        <div class="vote-wrap">
+            <div class="vote">
+                <button class="vote-down" title="赞同数">
+                    <span class="count"><%= topic.like_count %></span>
+                </button>
+            </div> 
+        </div>
+    </span>
+    <div class="media-body">
+        <div class="record-title">
+            <a href="/user/<%= topic.author.name %>" class="record-user"><%= topic.author.name %></a>
+            <% if (topic.isForward) { %>
+            <span>转 <a href="/user/<%= topic.source_user.name %>" style="color:#999;"><%= topic.source_user.name %></a></span>
+            <% } %>
+            <span> :</span>
+            <a href="/topic/<%= topic._id %>"><%= topic.title %></a>
+            
+        </div>
+        <div class="media-content-intro" >
+          <%- topic.intro %>
+          <% if (topic.hasLeft) { %>
+          ....<a href="" class="show-all">显示全部</a>
+          <% } %>
+        </div>
+        <div class="media-content clearfix" style="display:none;">
+          <%- markdown(topic.content) %>
+        </div>
+        <div class="media-info clearfix">
+            <span class="date"><%= topic.friendly_create_at %></span>
+            <span class="forward"> 转发</span>
+            <% if (topic.in_collection) { %>
+            <span class="collect" action="de_collect"> 取消收藏</span>
+            <% } else { %>
+            <span class="collect" action="collect"> 收藏</span>
+            <% } %>
+            <% if (topic.hasLiked) { %>
+            <span class="hasLiked"> 已赞</span>
+            <span class="like" style="display:none"> 赞</span>
+            <% } else { %>
+            <span class="hasLiked" style="display:none"> 已赞</span>
+            <span class="like"> 赞</span>
+            <% } %>
+            
+            <span class="h-reply-btn"> <span class="flag">讨论</span>(<span class="reply-conut"><%= topic.reply_count %></span>)</span>
+            <span class="pull-right close-content">收起内容</span>
+        </div>
+    </div>
+</div>
+<hr>

@@ -1,0 +1,31 @@
+<%- partial('../sign/sidebar') %>
+<div id='content' class="col-md-4">
+  <div>
+    <div class='inner'>
+      <% if(typeof(error) !== 'undefined' && error){ %>
+      <div class="alert alert-error">
+        <a class="close" data-dismiss="alert" href="#">&times;</a>
+        <strong><%= error %></strong>
+      </div>
+      <% } %>
+      <form id='signin_form' class="form" action='/signin' method='post'>
+        <div class='form-group'>
+          <label for='name'>用户名</label>
+          <input class='form-control' id='name' name='name' size='30' type='text'/>
+        </div>
+        <div class='form-group'>
+          <label for='pass'>密码</label>
+          <input class='form-control' id='pass' name='pass' size='30' type='password'/>
+        </div>
+        <input type='hidden' name='_csrf' value='<%= csrf %>'/>
+
+        <div class='form-actions' style="margin-bottom:5px;">
+          <input type='submit' class='btn' value='登录'/ style="margin-right:5px;">
+          <a href="/auth/github" class="btn btn-info">通过 GitHub 登录</a>
+        </div>
+        <div><a id="forgot_password" href='/search_pass'>忘记密码了?</a></div>
+      </form>
+    </div>
+  </div>
+</div>
+

@@ -1,0 +1,19 @@
+
+<div id='content' class="col-md-8">
+  <div class='panel'>
+    <div class='header'>
+      <ul class='breadcrumb'>
+        <li><a href='/user/<%= user.name %>'><%= user.name %> 的主页</a></li>
+        <li class='active'>关注Ta的人</li>
+      </ul>
+    </div>
+    <div class='inner'>
+      <% if (users.length > 0) { %>
+      <%- partial('../user/user', { collection: users, as: 'user' }) %>
+      <% } else { %>
+      <p>还没有任何人关注Ta</p>
+      <% } %>
+    </div>
+  </div>
+</div>
+<%- partial('../sidebar') %>

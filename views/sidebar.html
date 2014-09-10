@@ -1,0 +1,65 @@
+<div id='sidebar' class="col-md-4">
+  
+  <% if (typeof(profile) == 'undefined') { %>
+  <div>
+  <% if (typeof(user) !== 'undefined' || typeof(current_user) !== 'undefined') { %>
+    <div class='inner'>
+      <%- partial('user/card',{ object: typeof(user) === 'undefined' ? current_user : user, as: 'user' }) %>
+    </div>
+  <% } else { %>
+    <div class='inner'>
+      <p><%= config.description %></p>
+      <div>
+        您可以
+        <a href='/signin'>登录</a>
+        或
+        <a href='/signup'>注册</a>
+        , 也可以
+        <a href="/auth/github" class="btn btn-info">通过 GitHub 登录</a>
+      </div>
+    </div>
+  <% } %>
+  </div>
+  <hr>
+  <% } %>
+
+  <% if (typeof(profile) !== 'undefined') { %>
+  <div>
+    <% if (typeof(user) !== 'undefined' || typeof(current_user) !== 'undefined') { %>
+    <div class='inner'>
+      <%- partial('user/s_card',{ object: typeof(user) === 'undefined' ? current_user : user, as: 'user' }) %>
+    </div>
+    <% } %>
+  </div>
+  <% } %>
+
+  <% if (typeof(current_user) !== 'undefined' && typeof(home) !== 'undefined') { %>
+  <div class="sidebar-topic">
+      <ul>
+        <li><a href='/user/<%= current_user.name %>/topics'>我的记录</a></li>
+        <li><a href='/user/<%= current_user.name %>/collections'>我的收藏</a></li>
+        <li><a href="">我的草稿</a></li>
+      </ul>
+  </div>
+  <hr>
+  <% } %>
+  
+  <% if (typeof(site_links) !== 'undefined') { %>
+  <div style="margin-left:10px;">
+    <div class='header'>
+      <span class='col_fade'>友情链接</span>
+    </div>
+    <div class='inner'>
+      <% if (site_links.length > 0) { %>
+      <ol style="padding-left:20px;">
+        <%site_links.forEach(function (link) {%>
+        <li><a href="<%-link.url%>"><%-link.text%></a></li>
+        <%})%>
+      </ol>
+      <% } else { %>
+      <p>无</p>
+      <% } %>
+    </div>
+  </div>
+  <% } %>
+</div>

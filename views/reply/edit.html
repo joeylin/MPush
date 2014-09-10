@@ -1,0 +1,61 @@
+
+<div id='content' class="col-md-8">
+  <div>
+    <div class='header'>
+      <ol class='breadcrumb'>
+        <li><a href='/'>主页</a></li>
+        <li class='active'>编辑回复</li>
+      </ol>
+    </div>
+    <div class='inner post'>
+      <% if(typeof(edit_error) !== 'undefined' && edit_error){ %>
+      <div class="alert alert-danger">
+        <a class="close" data-dismiss="alert" href="#">&times;</a>
+        <strong><%= edit_error %></strong>
+      </div>
+      <% } %>
+      <% if(typeof(error) !== 'undefined' && error){ %>
+      <div class="alert alert-danger">
+        <strong><%= error %></strong>
+      </div>
+      <% }else{ %>
+      <form id='edit_reply_form' class="reply_edit" action='/reply/<%= reply_id %>/edit' method='post'>
+        <fieldset>
+          <div class='markdown_editor in_editor'>
+            <div class='markdown_in_editor'>
+              <textarea class='editor form-control autoHeight' name='t_content' rows='20'
+                        placeholder='回复支持 Markdown 语法, 请注意标记代码'
+                        autofocus
+                      ><%= typeof(content) !== 'undefined' && content || '' %></textarea>
+
+              <div class='editor_buttons' style="margin-top:10px;">
+                <!-- <input class='span-common action_preview' type="button" value="预览"> -->
+                <input type="submit" class='span-primary submit_btn' data-loading-text="提交中.."
+                       value="提交">
+              </div>
+            </div>
+            <!-- <div class='markdown_in_preview'>
+              <div class='preview'></div>
+              <div class='editor_buttons'>
+                <input class='span-common action_modify' type="button" value="修改">
+                <input type="submit" class='span-primary submit_btn' data-loading-text="提交中.."
+                       value="提交">
+              </div>
+            </div> -->
+          </div>
+
+          <input type='hidden' name='_csrf' value='<%= csrf %>'/>
+        </fieldset>
+      </form>
+    </div>
+    <% } %>
+  </div>
+</div>
+<%- partial('../editor_sidebar') %>
+
+<!-- markdown editor -->
+<%- Loader('/public/topic_edit.min.js')
+.js('/public/libs/marked.js')
+.js('/public/javascripts/markdown_editor.js')
+.done(assets, config.site_static_host, config.mini_assets)
+%>

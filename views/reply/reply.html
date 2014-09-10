@@ -1,0 +1,40 @@
+
+<div class="media" data-id="<%- reply._id %>"> 
+    <a href="/user/<%= reply.author.name %>" class="pull-left" id="<%- reply._id %>" >
+        <img src="<%= reply.author.avatar_url %>" title="<%= reply.author.name %>" style="width:30px;height:30px;">
+    </a>
+    <div class="media-body">
+        <div class="reply-title" style="margin-bottom:10px;">
+          <a href="/user/<%= reply.author.name %>"><%= reply.author.name %></a>
+        </div>
+        <div class="page-content" style="margin-bottom:10px;">
+            <%- markdown(reply.content) %>
+        </div>
+        <div class="media-info clearfix">
+            <span class="date" style="font-size:12px;"><%= reply.friendly_create_at %></span>
+            <span class="pull-right"><span class="up-count"><%= reply.ups && reply.ups.length ? reply.ups.length : 0 %></span> 赞</span>
+
+            <% if(typeof(current_user) !== 'undefined'){ %>
+
+            <% if(isUped(current_user, reply)){ %>
+            <span class="up uped">已赞 </span>
+            <% } else { %>
+            <span class="up up_btn">赞 </span>
+            <% } %>
+            <span class="inline-reply-btn">回复</span>
+            <% } %>
+
+            <% if ( typeof(current_user) !== 'undefined' && current_user.is_admin ||
+            (typeof(current_user) !== 'undefined' && current_user._id.toString() == reply.author._id.toString())
+            ) { %>
+            <a href='/reply/<%- reply._id %>/edit' class='edit_reply_btn'>
+              <span>编辑</span>
+            </a>
+            <a href='javascript:void(0);' class='delete_reply_btn'>
+              <span class="delete">删除</span>
+            </a>
+            <% } %>
+        </div>
+    </div>
+</div>
+<hr class="hr-sm">
