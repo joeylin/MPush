@@ -116,6 +116,7 @@
       topic_tags: tags,
       isPublic: isPublic ? 1 : 0
     };
+    console.log(isPublic);
     $.post('/api/topic/create', data, function(data) {
       if (data.code == 200) {
         window.location.href = '/topic/' + data._id;

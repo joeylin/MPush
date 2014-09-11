@@ -30,12 +30,18 @@
       </div>
       <div class="media-info clearfix">
           <span class="date"><%= topic.friendly_create_at %></span>
+          <span class="forward"> 转发</span>
           <span> 讨论(<%= topic.reply_count %>)</span>
           <span class="pull-right">
+            <% if (current_user.is_admin) { %>
+            <a href='/topic/<%= topic._id %>/edit' class="btn btn-success btn-sm">编辑</a>
+            <a href='javascript:;' data-id="<%= topic._id %>" class='delete_topic_btn btn btn-success btn-sm'>删除</a>
+            <% } else { %>
             <% if (typeof(current_user) !== 'undefined' && current_user._id == topic.author_id) { %>
             <a href='/topic/<%= topic._id %>/edit' class="edit btn btn-success btn-sm" style="margin-left:10px;">
               编辑
             </a>
+            <% } %>
             <% } %>
           </span>
 
@@ -202,6 +208,28 @@
     $('textarea.editor').atwho({
       at: '@',
       data: allNames
+    });
+
+    // 转发
+    $('#content').on('click', '.forward', function() {
+        var $me = $(this);
+        if ($me.data('done')) {
+          return false;
+        } else {
+          $me.data('done', true);
+        }
+        var id = $me.closest('.media').data('id');
+        var data = {
+          topic_id: id
+        };
+        $.post('/api/topic/forward', data, function (data) {
+          if (data.code == 200) {
+            $me.text('已转');
+          } else {
+            $me.data('done', false);
+          }
+        }, 'json');
+        return false;
     });
 
     // 点赞

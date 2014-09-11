@@ -84,7 +84,6 @@ exports.index = function (req, res, next) {
           } else {
             topic.hasLiked = false;
           }
-          console.log(topic.hasLiked);
           ep.emit('topic', topic);
         });
         
@@ -182,7 +181,7 @@ exports.put = function (req, res, next) {
 };
 exports.pagePut = function (req, res, next) {
   var content = req.body.t_content || '';
-  var isPublic = !!req.body.isPublic;
+  var isPublic = !!parseInt(req.body.isPublic);
 
   var edit_error =
       content === '' ?
@@ -274,6 +273,7 @@ exports.showEdit = function (req, res, next) {
       //     }
       //   }
       // });
+      console.log(topic.isPublic, 'showEdit');
       res.render('topic/edit', {action: 'edit', topic_id: topic._id, title: topic.title, content: topic.content, tags: topic.tags, isPublic: topic.isPublic});
     } else {
       res.render('notify/notify', {error: '对不起，你不能编辑此话题。'});
@@ -302,7 +302,7 @@ exports.update = function (req, res, next) {
       var title = sanitize(req.body.title).trim();
       title = sanitize(title).xss();
       var content = req.body.t_content;
-      var isPublic = req.body.isPublic;
+      var isPublic = !!parseInt(req.body.isPublic);
       var topic_tags = [];
       if (req.body.topic_tags !== '') {
         topic_tags = req.body.topic_tags.split(',');
@@ -420,7 +420,7 @@ exports.ajax_update = function (req, res, next) {
       var title = sanitize(req.body.title).trim();
       title = sanitize(title).xss();
       var content = req.body.t_content;
-      var isPublic = !!req.body.isPublic;
+      var isPublic = !!parseInt(req.body.isPublic);
       var topic_tags = [];
       if (req.body.topic_tags !== '') {
         topic_tags = req.body.topic_tags.split(',');
@@ -452,7 +452,7 @@ exports.ajax_update = function (req, res, next) {
         topic.isPublic = isPublic;
         topic.tags = req.body.topic_tags;
         topic.update_at = new Date();
-        topic.save(function (err) {
+        topic.save(function (err, topic) {
           if (err) {
             return next(err);
           }

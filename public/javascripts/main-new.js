@@ -83,6 +83,14 @@ $(document).ready(function() {
   // autoHeight
   $('.autoHeight').flexText();
 
+  // search
+  $('#keyword').on('keydown', function(e) {
+    var key = e.keyCode || e.which;
+    if (key === 13) {
+      $('#search_sub').submit();
+    }
+  });
+
   // load more
   // $("#record-container").autobrowse({
   //     url: function (offset){

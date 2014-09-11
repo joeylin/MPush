@@ -450,4 +450,39 @@ ul.unstyled {
 	min-height: 100px;
 }
 
+/* tags */
+.tags_btn {
+	background-color: rgb(91, 192, 222);
+	border-color: rgb(91, 192, 222);
+	color: #fff;
+	font-size: .9em;
+	padding: 0.3em 0.8em;
+	border-radius: 3px;
+	margin-bottom: 5px;
+}
+.pure-button {
+	display: inline-block;
+	zoom: 1;
+	line-height: normal;
+	white-space: nowrap;
+	vertical-align: baseline;
+	text-align: center;
+	cursor: pointer;
+	text-decoration: none;
+	-webkit-user-drag: none;
+	-webkit-user-select: none;
+	-moz-user-select: none;
+	-ms-user-select: none;
+	user-select: none;
+}
+.pure-button:hover {
+	outline: 0;
+	text-decoration: none;
+}
+.tags_btn.tags_default {
+	border: none rgba(0, 0, 0, 0);
+	background-color: #E6E6E6;
+	color: rgba(0, 0, 0, 0.80);
+}
+
 

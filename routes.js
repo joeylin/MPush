@@ -120,5 +120,8 @@ module.exports = function (app) {
   app.get('/auth/github/new', github.new);
   app.post('/auth/github/create', github.create);
 
-  app.get('/search', search.index);
+  app.get('/search', site.search);
+  app.get('/tags/', site.tags);
+  app.get('/tags/:tag', site.tag);
+
 };

@@ -80,7 +80,16 @@
         %>
         <li><a href="<%- nav[0] %>" target="<%- nav[2] %>"><%- nav[1] %></a></li>
         <% } %>
+        <li>
+
+        </li>
       </ul>
+      <div class="col-sm-3 col-md-3">
+          <form class="navbar-form" action="/search" method="get" role="search" style="padding-left:0;padding-right:0;">
+            <input type="text" class="form-control" placeholder="关键词搜索" name="keyword" id="keyword">
+            <input type="submit" id="search_sub" style="display:none;">
+          </form>
+      </div>
       <ul class="nav navbar-nav navbar-right">
         <% if (typeof(current_user) !== 'undefined') { %>
         <li>

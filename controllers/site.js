@@ -190,3 +190,77 @@ exports.topics = function (req, res, next) {
     proxy.emit('pages', pages);
   }));
 };
+
+exports.search = function (req, res, next) {
+  var page = parseInt(req.query.page, 10) || 1;
+  var keyword = req.query.keyword;
+  page = page > 0 ? page : 1;
+  var user = req.session.user;
+  var limit = config.list_topic_count;
+
+  var proxy = EventProxy.create('topics', 'no_reply_topics', 'pages',
+    function (topics, no_reply_topics, pages) {
+      res.render('search', {
+        keyword: keyword,
+        topics: topics,
+        current_page: page,
+        list_topic_count: limit,
+        pages: pages,
+        site_links: config.site_links
+      });
+    });
+  proxy.fail(next);
+
+  // 取主题
+  var query = {};
+  if(keyword) {
+    query['$or'] = [
+      { title: new RegExp(keyword) },
+      { content: new RegExp(keyword) }
+    ];//模糊查询参数
+  }
+  var options = { skip: (page - 1) * limit, limit: limit, sort: [
+    ['create_at', 'desc' ]
+  ] };
+  Topic.getTopicsByQuery(query, options, function(err, topics) {
+    var ep = new EventProxy();
+    ep.after('like_ready', topics.length, function() {
+      var ep1 = new EventProxy();
+      ep1.after('collect_ready', topics.length, function() {
+        proxy.emit('topics', topics);
+      });
+      topics.map(function(topic, key) {
+        TopicCollect.getTopicCollect(req.session.user._id, topic._id, ep.done(function (doc) {
+          topic.in_collection = !!doc;
+          ep1.emit('collect_ready', topic);
+        }));
+      });
+    });
+    topics.map(function(topic, key) {
+      Like.getLike(req.session.user._id, topic._id, function(err, like) {
+        if (like) {
+          topic.hasLiked = true;
+        } else {
+          topic.hasLiked = false;
+        }
+        ep.emit('like_ready', topic);
+      });
+    });      
+  });
+
+  // 取0回复的主题
+  Topic.getTopicsByQuery(
+    { reply_count: 0 },
+    { limit: 5, sort: [
+      [ 'create_at', 'desc' ]
+    ] },
+    proxy.done('no_reply_topics', function (no_reply_topics) {
+      return no_reply_topics;
+  }));
+
+  // 取分页数据
+  Topic.getCountByQuery(query, proxy.done(function (all_topics_count) {
+    var pages = Math.ceil(all_topics_count / limit);
+    proxy.emit('pages', pages);
+  }));
+};
