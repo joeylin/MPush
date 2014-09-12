@@ -85,7 +85,7 @@ var config = {
 
   // 邮箱配置
   mail_opts: {
-    host: 'smtp.163.com',
+    host: 'smtp.ym.163.com',
     port: 25,
     auth: {
       user: 'joeylin@morepush.com',
