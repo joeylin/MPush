@@ -151,11 +151,12 @@ exports.login = function (req, res, next) {
     if (pass !== user.pass) {
       return res.render('sign/signin', { error: '密码错误。' });
     }
-    if (!user.active && !config.debug) {
-      // 从新发送激活邮件
-      mail.sendActiveMail(user.email, md5(user.email + config.session_secret), user.name);
-      return res.render('sign/signin', { error: '此帐号还没有被激活，激活链接已发送到 ' + user.email + ' 邮箱，请查收。' });
-    }
+    user.active = true;
+    // if (!user.active && !config.debug) {
+    //   // 从新发送激活邮件
+    //   mail.sendActiveMail(user.email, md5(user.email + config.session_secret), user.name);
+    //   return res.render('sign/signin', { error: '此帐号还没有被激活，激活链接已发送到 ' + user.email + ' 邮箱，请查收。' });
+    // }
     // store session cookie
     gen_session(user, res);
     //check at some page just jump to home page
