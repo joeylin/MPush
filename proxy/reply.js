@@ -244,10 +244,9 @@ exports.getTpiocFlatRepliesLimit = function(id, num, cb) {
 
         return cb(err, replies.slice(0, num), hasLeft);
 
-
         function searchReply(id) {
           for (var i = replies.length - 1; i >= 0; i--) {
-            if (replies[i].reply_id.toString() == id) {
+            if (replies[i].reply_id && replies[i].reply_id.toString() == id) {
               return replies[i];
             }
           }
