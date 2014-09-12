@@ -58,3 +58,34 @@ exports.newAndSave = function (name, background, order, description, callback) {
   tag.description = description;
   tag.save(callback);
 };
+
+// new add
+exports.newTag = function(name, callback) {
+  Tag.findOne({name:name}, function(err, tag) {
+    if (err) {
+      callback(err, null);
+    }
+    if (tag) {
+      tag.topic_count +=1;
+      tag.save(callback);
+    } else {
+      var _tag = new Tag();
+      _tag.name = name;
+      _tag.save(callback);
+    }
+  });
+};
+
+exports.delTag = function(name, callback) {
+  Tag.findOne({name:name}, function(err, tag) {
+    if (err) {
+      callback(err, null);
+    }
+    if (tag) {
+      tag.topic_count -= 1;
+      tag.save(callback);
+    } else {
+      callback(null, null);
+    }
+  });
+};

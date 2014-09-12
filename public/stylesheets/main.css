@@ -485,4 +485,9 @@ ul.unstyled {
 	color: rgba(0, 0, 0, 0.80);
 }
 
+/* all_topics */
+.all_topics .tags .tag_count {
+	display: none;
+}
+
 

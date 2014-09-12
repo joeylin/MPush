@@ -117,6 +117,8 @@ exports.put = function (req, res, next) {
   var topic_tags = [];
   if (req.body.topic_tags !== '') {
     topic_tags = req.body.topic_tags.split(',');
+  } else {
+    res.render('topic/edit', {tags: tags, edit_error: '没填写标签', title: title, content: content});
   }
 
   var edit_error =
@@ -150,22 +152,18 @@ exports.put = function (req, res, next) {
 
       proxy.assign('tags_saved', 'score_saved', render);
       proxy.fail(next);
-      // 话题可以没有标签
-      if (topic_tags.length === 0) {
-        proxy.emit('tags_saved');
-      }
+      
       var tags_saved_done = function () {
         proxy.emit('tags_saved');
       };
       proxy.after('tag_saved', topic_tags.length, tags_saved_done);
       //save topic tags
-      topic_tags.forEach(function (tag) {
-        TopicTag.newAndSave(topic._id, tag, proxy.done('tag_saved'));
-        Tag.getTagById(tag, proxy.done(function (tag) {
-          tag.topic_count += 1;
-          tag.save();
-        }));
+      topic_tags.forEach(function (tag_name) {
+        Tag.newTag(tag_name, function(err, tag) {
+          proxy.emit('tag_saved');
+        });
       });
+
       User.getUserById(req.session.user._id, proxy.done(function (user) {
         user.score += 5;
         user.topic_count += 1;
@@ -182,6 +180,10 @@ exports.put = function (req, res, next) {
 exports.pagePut = function (req, res, next) {
   var content = req.body.t_content || '';
   var isPublic = !!parseInt(req.body.isPublic);
+  var topic_tags = [];
+  if (req.body.topic_tags !== '') {
+    topic_tags = req.body.topic_tags.split(',');
+  }
 
   var edit_error =
       content === '' ?
@@ -205,7 +207,7 @@ exports.pagePut = function (req, res, next) {
       title = req.body.title;
     }   
   } else {
-    var titleArr = content.match(/(.{0,30}[\。|\，\、|\!|\！|\？|\?|\:|\;|\.|\,|.])/);
+    var titleArr = content.match(/(.{0,30}[\/n|\。|\，\、|\!|\！|\？|\?|\:|\;|\.|\,|.])/);
     if (!titleArr) {
       title = content.slice(0, 20);
     } else {
@@ -228,8 +230,19 @@ exports.pagePut = function (req, res, next) {
       });
     };
 
-    proxy.assign('score_saved', render);
+    proxy.assign('tags_saved', 'score_saved', render);
     proxy.fail(next);
+
+    var tags_saved_done = function () {
+      proxy.emit('tags_saved');
+    };
+    proxy.after('tag_saved', topic_tags.length, tags_saved_done);
+    //save topic tags
+    topic_tags.forEach(function (tag_name) {
+      Tag.newTag(tag_name, function(err, tag) {
+        proxy.emit('tag_saved');
+      });
+    });
 
     User.getUserById(req.session.user._id, proxy.done(function (user) {
       user.score += 5;
@@ -308,7 +321,7 @@ exports.update = function (req, res, next) {
         topic_tags = req.body.topic_tags.split(',');
       }
 
-      if (title === '') {
+      if (title === '' || topic_tags.length === 0) {
         Tag.getAllTags(function (err, all_tags) {
           if (err) {
             return next(err);
@@ -338,52 +351,52 @@ exports.update = function (req, res, next) {
 
           // 标签处理，暂时还没做。
 
-          // var proxy = new EventProxy();
-          // var render = function () {
-          //   res.redirect('/topic/' + topic._id);
-          // };
-          // proxy.assign('tags_removed_done', 'tags_saved_done', render);
-          // proxy.fail(next);
+          var proxy = new EventProxy();
+          var render = function () {
+            res.redirect('/topic/' + topic._id);
+          };
+          proxy.assign('tags_removed_done', 'tags_saved_done', render);
+          proxy.fail(next);
 
           // 删除topic_tag
-          // var tags_removed_done = function () {
-          //   proxy.emit('tags_removed_done');
-          // };
-          // TopicTag.getTopicTagByTopicId(topic._id, function (err, docs) {
-          //   if (docs.length === 0) {
-          //     proxy.emit('tags_removed_done');
-          //   } else {
-          //     proxy.after('tag_removed', docs.length, tags_removed_done);
-          //     // delete topic tags
-          //     docs.forEach(function (doc) {
-          //       doc.remove(proxy.done(function () {
-          //         Tag.getTagById(doc.tag_id, proxy.done(function (tag) {
-          //           proxy.emit('tag_removed');
-          //           tag.topic_count -= 1;
-          //           tag.save();
-          //         }));
-          //       }));
-          //     });
-          //   }
-          // });
+          var tags_removed_done = function () {
+            proxy.emit('tags_removed_done');
+          };
+          TopicTag.getTopicTagByTopicId(topic._id, function (err, docs) {
+            if (docs.length === 0) {
+              proxy.emit('tags_removed_done');
+            } else {
+              proxy.after('tag_removed', docs.length, tags_removed_done);
+              // delete topic tags
+              docs.forEach(function (doc) {
+                doc.remove(proxy.done(function () {
+                  Tag.getTagById(doc.tag_id, proxy.done(function (tag) {
+                    proxy.emit('tag_removed');
+                    tag.topic_count -= 1;
+                    tag.save();
+                  }));
+                }));
+              });
+            }
+          });
           // 保存topic_tag
-          // var tags_saved_done = function () {
-          //   proxy.emit('tags_saved_done');
-          // };
-          //话题可以没有标签
-          // if (topic_tags.length === 0) {
-          //   proxy.emit('tags_saved_done');
-          // } else {
-          //   proxy.after('tag_saved', topic_tags.length, tags_saved_done);
-          //   //save topic tags
-          //   topic_tags.forEach(function (tag) {
-          //     TopicTag.newAndSave(topic._id, tag, proxy.done('tag_saved'));
-          //     Tag.getTagById(tag, proxy.done(function (tag) {
-          //       tag.topic_count += 1;
-          //       tag.save();
-          //     }));
-          //   });
-          // }
+          var tags_saved_done = function () {
+            proxy.emit('tags_saved_done');
+          };
+          // 话题可以没有标签
+          if (topic_tags.length === 0) {
+            proxy.emit('tags_saved_done');
+          } else {
+            proxy.after('tag_saved', topic_tags.length, tags_saved_done);
+            //save topic tags
+            topic_tags.forEach(function (tag) {
+              TopicTag.newAndSave(topic._id, tag, proxy.done('tag_saved'));
+              Tag.getTagById(tag, proxy.done(function (tag) {
+                tag.topic_count += 1;
+                tag.save();
+              }));
+            });
+          }
           //发送at消息
           at.sendMessageToMentionUsers(content, topic._id, req.session.user._id);
         });
@@ -426,7 +439,7 @@ exports.ajax_update = function (req, res, next) {
         topic_tags = req.body.topic_tags.split(',');
       }
 
-      if (title === '') {
+      if (title === '' || topic_tags.length === 0) {
         Tag.getAllTags(function (err, all_tags) {
           if (err) {
             return next(err);
@@ -461,54 +474,52 @@ exports.ajax_update = function (req, res, next) {
             id: topic_id
           });
 
-          // 标签处理，暂时还没做。
-
-          // var proxy = new EventProxy();
-          // var render = function () {
-          //   res.redirect('/topic/' + topic._id);
-          // };
-          // proxy.assign('tags_removed_done', 'tags_saved_done', render);
-          // proxy.fail(next);
+          var proxy = new EventProxy();
+          var render = function () {
+            res.redirect('/topic/' + topic._id);
+          };
+          proxy.assign('tags_removed_done', 'tags_saved_done', render);
+          proxy.fail(next);
 
           // 删除topic_tag
-          // var tags_removed_done = function () {
-          //   proxy.emit('tags_removed_done');
-          // };
-          // TopicTag.getTopicTagByTopicId(topic._id, function (err, docs) {
-          //   if (docs.length === 0) {
-          //     proxy.emit('tags_removed_done');
-          //   } else {
-          //     proxy.after('tag_removed', docs.length, tags_removed_done);
-          //     // delete topic tags
-          //     docs.forEach(function (doc) {
-          //       doc.remove(proxy.done(function () {
-          //         Tag.getTagById(doc.tag_id, proxy.done(function (tag) {
-          //           proxy.emit('tag_removed');
-          //           tag.topic_count -= 1;
-          //           tag.save();
-          //         }));
-          //       }));
-          //     });
-          //   }
-          // });
-          // 保存topic_tag
-          // var tags_saved_done = function () {
-          //   proxy.emit('tags_saved_done');
-          // };
+          var tags_removed_done = function () {
+            proxy.emit('tags_removed_done');
+          };
+          TopicTag.getTopicTagByTopicId(topic._id, function (err, docs) {
+            if (docs.length === 0) {
+              proxy.emit('tags_removed_done');
+            } else {
+              proxy.after('tag_removed', docs.length, tags_removed_done);
+              // delete topic tags
+              docs.forEach(function (doc) {
+                doc.remove(proxy.done(function () {
+                  Tag.getTagById(doc.tag_id, proxy.done(function (tag) {
+                    proxy.emit('tag_removed');
+                    tag.topic_count -= 1;
+                    tag.save();
+                  }));
+                }));
+              });
+            }
+          });
+          保存topic_tag
+          var tags_saved_done = function () {
+            proxy.emit('tags_saved_done');
+          };
           //话题可以没有标签
-          // if (topic_tags.length === 0) {
-          //   proxy.emit('tags_saved_done');
-          // } else {
-          //   proxy.after('tag_saved', topic_tags.length, tags_saved_done);
-          //   //save topic tags
-          //   topic_tags.forEach(function (tag) {
-          //     TopicTag.newAndSave(topic._id, tag, proxy.done('tag_saved'));
-          //     Tag.getTagById(tag, proxy.done(function (tag) {
-          //       tag.topic_count += 1;
-          //       tag.save();
-          //     }));
-          //   });
-          // }
+          if (topic_tags.length === 0) {
+            proxy.emit('tags_saved_done');
+          } else {
+            proxy.after('tag_saved', topic_tags.length, tags_saved_done);
+            //save topic tags
+            topic_tags.forEach(function (tag) {
+              TopicTag.newAndSave(topic._id, tag, proxy.done('tag_saved'));
+              Tag.getTagById(tag, proxy.done(function (tag) {
+                tag.topic_count += 1;
+                tag.save();
+              }));
+            });
+          }
           //发送at消息
           at.sendMessageToMentionUsers(content, topic._id, req.session.user._id);
         });
