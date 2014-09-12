@@ -163,7 +163,7 @@ $(document).ready(function() {
 		return str.replace('__id__', reply._id)
 			.replace('__date__', reply.friendly_create_at)
 			.replace('__content__', marked(reply.content))
-			.replace('__img__', reply.author.avatar_url)
+			.replace('__img__', reply.author.avatar || reply.author.avatar_url)
 			.replace('__likeClass__', likeClass)
 			.replace('__likeText__', likeText)
 			.replace('__likeCount__', reply.like_count || 0)

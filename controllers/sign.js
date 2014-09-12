@@ -43,8 +43,8 @@ exports.signup = function (req, res, next) {
     return;
   }
 
-  if (name.length < 5) {
-    res.render('sign/signup', {error: '用户名至少需要5个字符。', name: name, email: email});
+  if (name.length < 2) {
+    res.render('sign/signup', {error: '用户名至少需要2个字符。', name: name, email: email});
     return;
   }
 
@@ -160,7 +160,7 @@ exports.login = function (req, res, next) {
     //   mail.sendActiveMail(user.email, md5(user.email + config.session_secret), user.name);
     //   return res.render('sign/signin', { error: '此帐号还没有被激活，激活链接已发送到 ' + user.email + ' 邮箱，请查收。' });
     // }
-    
+
     // store session cookie
     gen_session(user, res);
     //check at some page just jump to home page

@@ -4,10 +4,10 @@
         <img src="<%= reply.author.avatar_url %>" title="<%= reply.author.name %>" style="width:30px;height:30px;">
     </a>
     <div class="media-body">
-        <div class="reply-title" style="margin-bottom:10px;">
+        <div class="reply-title">
           <a href="/user/<%= reply.author.name %>"><%= reply.author.name %></a>
         </div>
-        <div class="page-content" style="margin-bottom:10px;">
+        <div class="page-content" >
             <%- markdown(reply.content) %>
         </div>
         <div class="media-info clearfix">
