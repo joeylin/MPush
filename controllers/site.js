@@ -94,6 +94,12 @@ exports.index = function (req, res, next) {
         });
       });      
     });
+
+    // 取分页数据
+    Topic.getCountByQuery(query, proxy.done(function (all_topics_count) {
+      var pages = Math.ceil(all_topics_count / limit);
+      proxy.emit('pages', pages);
+    }));
   });
   Relation.getFollowings(req.session.user._id, function(err, relations) {
     if (err) {
@@ -119,11 +125,7 @@ exports.index = function (req, res, next) {
       return no_reply_topics;
   }));
 
-  // 取分页数据
-  Topic.getCountByQuery({}, proxy.done(function (all_topics_count) {
-    var pages = Math.ceil(all_topics_count / limit);
-    proxy.emit('pages', pages);
-  }));
+    
 };
 
 exports.topics = function (req, res, next) {

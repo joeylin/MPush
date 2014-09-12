@@ -10,22 +10,22 @@
         <div class='user_profile'>
           <ul class='unstyled'>
             <li>
-              <strong>地点 : </strong>
+              <span class="i_label">地点 : </span>
               <span class='dark'><%= user.location ? user.location : '还没填写地点' %></span>
             </li>
             <li>
-              <strong>微博 : </strong> 
+              <span class="i_label">微博 : </span> 
               <a class='dark' href="<%= user.weibo ? user.weibo : '' %>" target='_blank'><%= user.weibo ? user.weibo : '还没填写微博' %></a>
             </li>
             
             <li>
-              <strong>Github : </strong> 
+              <span class="i_label">Github : </span> 
               <a class='dark' href="https://github.com/<%= user.githubUsername ? user.githubUsername : '' %>" target='_blank'>
                 @<%= user.githubUsername ? user.githubUsername : '还没填写git账号' %>
               </a>
             </li>
             <li>
-              <strong>个人主页: </strong> 
+              <span class="i_label">个人主页: </span> 
               <a class='dark' href="<%= user.url %>" target='_blank'><%= user.url ? user.url : '还没有填写主页' %></a>
             </li>
           </ul>
@@ -59,7 +59,6 @@
            target="_blank">激活账号</a>
         <% } %>
         <% } %>
-
       </div>
     </div>
   </div>
@@ -70,13 +69,11 @@
     </div>
     <% if (typeof(recent_topics) !== 'undefined' && recent_topics.length > 0) { %>
     <%- partial('../topic/item', { collection: recent_topics, as: 'topic' }) %>
-    <div class=''>
-      <a class='profile-more' href="/user/<%= user.name %>/topics">查看更多»</a>
+    <div class='clearfix'>
+      <a class='profile-more' href="/user/<%= user.name %>/topics">查看更多>></a>
     </div>
     <% } else { %>
-    <div class='inner'>
-      <p>无话题</p>
-    </div>
+    <p>无话题</p>
     <% } %>
   </div>
 
@@ -87,14 +84,13 @@
     <% if (typeof(recent_replies) !== 'undefined' && recent_replies.length > 0) { %>
     <%- partial('../topic/item', { collection: recent_replies, as: 'topic' }) %>
     <div class='clearfix'>
-      <a class='profile-more' href="/user/<%= user.name %>/replies">查看更多»</a>
+      <a class='profile-more' href="/user/<%= user.name %>/replies">查看更多>></a>
     </div>
     <% } else { %>
-    <div class='inner'>
-      <p>无话题</p>
-    </div>
+    <p>无话题</p>
     <% } %>
   </div>
+  
 </div>
 <%- partial('../sidebar') %>
 

@@ -1,6 +1,6 @@
 
 <div class="col-md-8 all_topics" id="content">
-    <h4 style="font-weight:700;">所有记录</h4>
+    <h4 style="font-weight:700;margin-bottom:15px;">所有记录</h4>
     <div class="tags">
       <% if (typeof(tags) !== 'undefined' && tags.length > 0) { %>
         <%- partial('tag/item', {collection:tags, as:'tag'}) %>

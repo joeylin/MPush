@@ -46,12 +46,12 @@
   
   <% if (typeof(site_links) !== 'undefined') { %>
   <div style="margin-left:10px;">
-    <div class='header'>
+    <div style="margin-bottom:5px;">
       <span class='col_fade'>友情链接</span>
     </div>
     <div class='inner'>
       <% if (site_links.length > 0) { %>
-      <ol style="padding-left:20px;">
+      <ol style="padding-left: 10px;">
         <%site_links.forEach(function (link) {%>
         <li><a href="<%-link.url%>"><%-link.text%></a></li>
         <%})%>

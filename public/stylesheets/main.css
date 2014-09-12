@@ -1,5 +1,6 @@
-body, .label {
-	font-family: 微軟正黑體, 'Open Sans', sans-serif;
+body {
+	font-family: 'Helvetica Neue', 微软雅黑, Tohoma;
+	/*background: url("/public/images/bg.png") 0 0 repeat;*/
 }
 .wrap {
 	max-width: 960px!important;
@@ -407,7 +408,7 @@ ul.unstyled {
 .user_profile {
 	margin-top: 26px;
 }
-.user_profile strong {
+.user_profile .i_label {
 	width: 77px;
 	display: inline-block;
 }
@@ -459,6 +460,7 @@ ul.unstyled {
 	padding: 0.3em 0.8em;
 	border-radius: 3px;
 	margin-bottom: 5px;
+	margin-right: 5px;
 }
 .pure-button {
 	display: inline-block;

@@ -152,7 +152,7 @@ exports.put = function (req, res, next) {
 
       proxy.assign('tags_saved', 'score_saved', render);
       proxy.fail(next);
-      
+
       var tags_saved_done = function () {
         proxy.emit('tags_saved');
       };
@@ -502,7 +502,7 @@ exports.ajax_update = function (req, res, next) {
               });
             }
           });
-          保存topic_tag
+          // 保存topic_tag
           var tags_saved_done = function () {
             proxy.emit('tags_saved_done');
           };
