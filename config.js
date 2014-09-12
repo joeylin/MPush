@@ -5,7 +5,7 @@
 var path = require('path');
 var pkg = require('./package.json');
 
-var debug = true;
+var debug = false;
 
 var config = {
   // debug 为 true 时，用于本地调试
@@ -28,7 +28,7 @@ var config = {
   // cdn host，如 http://cnodejs.qiniudn.com
   site_static_host: '', // 静态文件存储域名
   // 社区的域名
-  host: 'localhost',
+  host: 'morepush.com',
   // 默认的Google tracker ID，自有站点请修改，申请地址：http://www.google.com/analytics/
   google_tracker_id: 'UA-54659872-1',
 
