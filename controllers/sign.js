@@ -152,6 +152,7 @@ exports.login = function (req, res, next) {
       return res.render('sign/signin', { error: '密码错误。' });
     }
     user.active = true;
+    user.save();
     // if (!user.active && !config.debug) {
     //   // 从新发送激活邮件
     //   mail.sendActiveMail(user.email, md5(user.email + config.session_secret), user.name);
