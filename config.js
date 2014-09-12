@@ -5,7 +5,7 @@
 var path = require('path');
 var pkg = require('./package.json');
 
-var debug = true;
+var debug = false;
 
 var config = {
   // debug 为 true 时，用于本地调试
