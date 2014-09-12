@@ -48,12 +48,12 @@ exports.signup = function (req, res, next) {
     return;
   }
 
-  try {
-    check(name, '用户名只能使用0-9，a-z，A-Z。').isAlphanumeric();
-  } catch (e) {
-    res.render('sign/signup', {error: e.message, name: name, email: email});
-    return;
-  }
+  // try {
+  //   check(name, '用户名只能使用0-9，a-z，A-Z。').isAlphanumeric();
+  // } catch (e) {
+  //   res.render('sign/signup', {error: e.message, name: name, email: email});
+  //   return;
+  // }
 
   if (pass !== re_pass) {
     res.render('sign/signup', {error: '两次密码输入不一致。', name: name, email: email});
