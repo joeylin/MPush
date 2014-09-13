@@ -124,8 +124,6 @@ exports.index = function (req, res, next) {
     proxy.done('no_reply_topics', function (no_reply_topics) {
       return no_reply_topics;
   }));
-
-    
 };
 
 exports.topics = function (req, res, next) {
@@ -290,7 +288,7 @@ exports.tags = function (req, res, next) {
 
   // 取标签
   TagModel.find({}, [], {sort: [
-    ['topic_count', 'asc']
+    ['topic_count', 'desc']
   ], field: 'name topic_count'}, proxy.done('tags', function(tags) {
     return tags;
   }));

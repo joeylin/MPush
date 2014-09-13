@@ -73,7 +73,7 @@ module.exports = function (app) {
   // topic
   // 新建文章界面
   app.get('/topic/create', auth.signinRequired, topic.create);
-  app.get('/topic/:tid', topic.index);  // 显示某个话题
+  app.get('/topic/:tid', auth.signinRequired, topic.index);  // 显示某个话题
   app.get('/topic/:tid/top/:is_top?', auth.signinRequired, topic.top);  // 将某话题置顶
   app.get('/topic/:tid/edit', auth.signinRequired, topic.showEdit);  // 编辑某话题
 
