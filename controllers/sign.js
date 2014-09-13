@@ -104,11 +104,13 @@ exports.signup = function (req, res, next) {
  * @param  {HttpResponse} res
  */
 exports.showLogin = function (req, res) {
-  req.session._loginReferer = req.headers.referer;
+  req.session._loginReferer = req.headers.referer || '/';
   var limit = config.list_topic_count;
 
   // 取主题
-  var options = {limit: limit, sort: '-create_at'};
+  var options = {limit: limit, sort: [
+    ['create_at', 'desc' ]
+  ]};
   Topic.getTopicsByQuery({}, options, function(err, topics) {
     res.render('sign/signin', {topics:topics});
   });

@@ -73,7 +73,7 @@ module.exports = function (app) {
   // topic
   // 新建文章界面
   app.get('/topic/create', auth.signinRequired, topic.create);
-  app.get('/topic/:tid', auth.signinRequired, topic.index);  // 显示某个话题
+  app.get('/topic/:tid', topic.index);  // 显示某个话题
   app.get('/topic/:tid/top/:is_top?', auth.signinRequired, topic.top);  // 将某话题置顶
   app.get('/topic/:tid/edit', auth.signinRequired, topic.showEdit);  // 编辑某话题
 
@@ -120,8 +120,8 @@ module.exports = function (app) {
   app.get('/auth/github/new', github.new);
   app.post('/auth/github/create', github.create);
 
-  app.get('/search', site.search);
-  app.get('/tags', site.tags);
-  app.get('/tags/:tag', site.tag);
+  app.get('/search', auth.userRequired, site.search);
+  app.get('/tags', auth.userRequired, site.tags);
+  app.get('/tags/:tag', auth.userRequired, site.tag);
 
 };

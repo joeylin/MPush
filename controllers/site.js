@@ -348,7 +348,7 @@ exports.tag = function (req, res, next) {
         }));
       });
     });
-    topics.map(function(topic, key) {
+    topics.map(function(topic, key) { 
       Like.getLike(req.session.user._id, topic._id, function(err, like) {
         if (like) {
           topic.hasLiked = true;
