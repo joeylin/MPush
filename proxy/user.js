@@ -103,6 +103,18 @@ exports.getUserByQuery = function (name, key, callback) {
   User.findOne({name: name, retrieve_key: key}, callback);
 };
 
+/**
+ * 获取关键词能搜索到的用户数量
+ * Callback:
+ * - err, 数据库错误
+ * - count, 主题数量
+ * @param {String} query 搜索关键词
+ * @param {Function} callback 回调函数
+ */
+exports.getCountByQuery = function (query, callback) {
+  User.count(query, callback);
+};
+
 exports.newAndSave = function (name, loginname, pass, email, avatar_url, active, callback) {
   var user = new User();
   user.name = name;

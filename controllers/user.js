@@ -535,7 +535,7 @@ exports.top100 = function (req, res, next) {
   });
 };
 
-exports.list_topics = function (req, res, next) {
+exports.records = function(req, res, next) {
   var user_name = req.params.name;
   var page = Number(req.query.page) || 1;
   var limit = config.list_topic_count;
@@ -562,6 +562,51 @@ exports.list_topics = function (req, res, next) {
     proxy.fail(next);
 
     var query = {'author_id': user._id};
+    var opt = {skip: (page - 1) * limit, limit: limit, sort: [
+      ['create_at', 'desc']
+    ]};
+    Topic.getTopicsByQuery(query, opt, proxy.done('topics'));
+
+    if (!req.session.user) {
+      proxy.emit('relation', null);
+    } else {
+      Relation.getRelation(req.session.user._id, user._id, proxy.done('relation'));
+    }
+
+    Topic.getCountByQuery(query, proxy.done(function (all_topics_count) {
+      var pages = Math.ceil(all_topics_count / limit);
+      proxy.emit('pages', pages);
+    }));
+  });
+};
+
+exports.list_topics = function (req, res, next) {
+  var user_name = req.params.name;
+  var page = Number(req.query.page) || 1;
+  var limit = config.list_topic_count;
+
+  User.getUserByName(user_name, function (err, user) {
+    if (!user) {
+      res.render('notify/notify', {error: '这个用户不存在。'});
+      return;
+    }
+
+    var render = function (topics, relation, pages) {
+      user.friendly_create_at = Util.format_date(user.create_at, true);
+      res.render('user/topics', {
+        user: user,
+        topics: topics,
+        relation: relation,
+        current_page: page,
+        pages: pages
+      });
+    };
+
+    var proxy = new EventProxy();
+    proxy.assign('topics', 'relation', 'pages', render);
+    proxy.fail(next);
+
+    var query = {'author_id': user._id, isPublic: true};
     var opt = {skip: (page - 1) * limit, limit: limit, sort: [
       ['create_at', 'desc']
     ]};

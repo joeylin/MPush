@@ -124,4 +124,7 @@ module.exports = function (app) {
   app.get('/tags', auth.userRequired, site.tags);
   app.get('/tags/:tag', auth.userRequired, site.tag);
 
+  // 个人记事本页面
+  app.get('/records', auth.userRequired, user.records);
+
 };

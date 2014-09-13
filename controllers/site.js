@@ -204,15 +204,16 @@ exports.topics = function (req, res, next) {
 exports.search = function (req, res, next) {
   var page = parseInt(req.query.page, 10) || 1;
   var keyword = req.query.keyword;
+  var type = req.query.type || 'topic';
   page = page > 0 ? page : 1;
-  var user = req.session.user;
   var limit = config.list_topic_count;
 
-  var proxy = EventProxy.create('topics', 'no_reply_topics', 'pages',
-    function (topics, no_reply_topics, pages) {
+  var proxy = EventProxy.create('type', 'results', 'no_reply_topics', 'pages',
+    function (type, results, no_reply_topics, pages) {
       res.render('search', {
+        type: type,
         keyword: keyword,
-        topics: topics,
+        results: results,
         current_page: page,
         list_topic_count: limit,
         pages: pages,
@@ -223,40 +224,81 @@ exports.search = function (req, res, next) {
 
   // 取主题
   var query = {};
-  if(keyword) {
+  if(keyword && type === 'topic') {
     query['$or'] = [
       { title: new RegExp(keyword) },
       { content: new RegExp(keyword) }
     ];//模糊查询参数
   }
-  var options = { skip: (page - 1) * limit, limit: limit, sort: [
-    ['create_at', 'desc' ]
-  ] };
-  Topic.getTopicsByQuery(query, options, function(err, topics) {
-    var ep = new EventProxy();
-    ep.after('like_ready', topics.length, function() {
-      var ep1 = new EventProxy();
-      ep1.after('collect_ready', topics.length, function() {
-        proxy.emit('topics', topics);
+  if (keyword && type === 'people') {
+    query['name'] = new RegExp(keyword)
+  }
+
+  if (type === 'topic') {
+    var options = { skip: (page - 1) * limit, limit: limit, sort: [
+      ['create_at', 'desc' ]
+    ] };
+    Topic.getTopicsByQuery(query, options, function(err, topics) {
+      var ep = new EventProxy();
+      ep.after('like_ready', topics.length, function() {
+        var ep1 = new EventProxy();
+        ep1.after('collect_ready', topics.length, function() {
+          proxy.emit('results', topics);
+          proxy.emit('type', 'topic');
+        });
+        topics.map(function(topic, key) {
+          TopicCollect.getTopicCollect(req.session.user._id, topic._id, ep.done(function (doc) {
+            topic.in_collection = !!doc;
+            ep1.emit('collect_ready', topic);
+          }));
+        });
       });
       topics.map(function(topic, key) {
-        TopicCollect.getTopicCollect(req.session.user._id, topic._id, ep.done(function (doc) {
-          topic.in_collection = !!doc;
-          ep1.emit('collect_ready', topic);
-        }));
-      });
+        Like.getLike(req.session.user._id, topic._id, function(err, like) {
+          if (like) {
+            topic.hasLiked = true;
+          } else {
+            topic.hasLiked = false;
+          }
+          ep.emit('like_ready', topic);
+        });
+      });      
     });
-    topics.map(function(topic, key) {
-      Like.getLike(req.session.user._id, topic._id, function(err, like) {
-        if (like) {
-          topic.hasLiked = true;
-        } else {
-          topic.hasLiked = false;
-        }
-        ep.emit('like_ready', topic);
+
+    // 取分页数据
+    Topic.getCountByQuery(query, proxy.done(function (all_topics_count) {
+      var pages = Math.ceil(all_topics_count / limit);
+      proxy.emit('pages', pages);
+    }));
+  } else {
+    var options = { skip: (page - 1) * limit, limit: limit, sort: [
+      ['create_at', 'desc' ]
+    ] };
+    User.getUsersByQuery(query, options, function(err, users) {
+      var ep = new EventProxy();
+      ep.after('follow_ready', users.length, function() {
+        proxy.emit('results', users);
+        proxy.emit('type', 'people');
       });
-    });      
-  });
+      users.map(function(user, key) {
+        Relation.getRelation(req.session.user._id, user._id, function(err, relation) {
+          if (relation) {
+            user.followed = true;
+          } else {
+            user.followed = false;
+          }
+          ep.emit('follow_ready', user);
+        });
+      });      
+    });
+
+    // 取分页数据
+    User.getCountByQuery(query, proxy.done(function (all_topics_count) {
+      var pages = Math.ceil(all_topics_count / limit);
+      proxy.emit('pages', pages);
+    }));
+  }
+    
 
   // 取0回复的主题
   Topic.getTopicsByQuery(
@@ -268,11 +310,7 @@ exports.search = function (req, res, next) {
       return no_reply_topics;
   }));
 
-  // 取分页数据
-  Topic.getCountByQuery(query, proxy.done(function (all_topics_count) {
-    var pages = Math.ceil(all_topics_count / limit);
-    proxy.emit('pages', pages);
-  }));
+    
 };
 
 exports.tags = function (req, res, next) {
