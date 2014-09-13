@@ -85,8 +85,7 @@ exports.index = function (req, res, next) {
             topic.hasLiked = false;
           }
           ep.emit('topic', topic);
-        });
-        
+        });        
       }));
       Relation.getRelation(req.session.user._id, author._id, ep.done('relation'));
     }
