@@ -15,7 +15,6 @@ body {
 	line-height: 34px;
 }
 .header .input-topic {
-	width: 280px;
 	margin-bottom: 0px;
 	float: right
 }
@@ -493,4 +492,9 @@ ul.unstyled {
 	display: none;
 }
 
+/* markdown style */
+.markdown-text pre.prettyprint {
+	padding: 10px;
+	border: 1px solid #ccc; 
+}
 
