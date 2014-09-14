@@ -17,7 +17,7 @@
     <div class="media-body">
       <h4 style="margin-bottom:5px;margin-top:0;font-weight:700;"><%= topic.title %></h4>
       <div style="margin-bottom:15px;color:#999;">
-          作者: <a href="user/<%= topic.author.name %>"><%= topic.author.name %></a>
+          作者: <a href="/user/<%= topic.author.name %>"><%= topic.author.name %></a>
            标签: <span class="" style="font-size:12px;"><%= topic.tags %></span>
           <% if (topic.friendly_create_at != topic.friendly_update_at) { %>
           <span>
@@ -46,11 +46,11 @@
           </span>
 
           <!-- 微博分享 -->
-          <a href="" class="pull-right btn btn-success btn-sm">
-            <span class='span-success' id='share_weibo_btn'
-            onclick="((function(s,d,e,r,l,p,t,z,c){var f='http://v.t.sina.com.cn/share/share.php?appkey=<%= config.weibo_key %>',u=z||d.location,p=['&url=',e(u),'&title=',e(t||d.title),'&source=',e(r),'&sourceUrl=',e(l),'&content=',c||'gb2312','&pic=',e(p||'')].join('');function a(){if(!window.open([f,p].join(''),'mb',['toolbar=0,status=0,resizable=1,width=440,height=430,left=',(s.width-440)/2,',top=',(s.height-430)/2].join('')))u.href=[f,p].join('');};if(/Firefox/.test(navigator.userAgent))setTimeout(a,0);else a();})(screen,document,encodeURIComponent,'','','','分享来自<%= config.name %>的话题：<%= topic.title %>','',''));"
-              >分享到微博</span>
-          </a> 
+          
+          <button class='pull-right btn btn-success btn-sm' id='share_weibo_btn'
+            onclick="((function(s,d,e,r,l,p,t,z,c){var f='http://v.t.sina.com.cn/share/share.php?appkey=<%= config.weibo_key %>',u=z||d.location,p=['&url=',e(u),'&title=',e(t||d.title),'&source=',e(r),'&sourceUrl=',e(l),'&content=',c||'gb2312','&pic=',e(p||'')].join('');function a(){if(!window.open([f,p].join(''),'mb',['toolbar=0,status=0,resizable=1,width=640,height=370,left=',(s.width-640)/2,',top=',(s.height-370)/2].join('')))u.href=[f,p].join('');};if(/Firefox/.test(navigator.userAgent))setTimeout(a,0);else a();})(screen,document,encodeURIComponent,'','','','分享来自<%= config.name %>的话题：<%= topic.title %>','',''));"
+              >分享到微博</button>
+          
           <!-- 收藏 -->
           <% if (typeof(current_user) !== 'undefined') { %>
           <% if (!topic.in_collection) { %>

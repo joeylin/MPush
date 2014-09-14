@@ -36,8 +36,8 @@
   <% if (typeof(current_user) !== 'undefined' && typeof(home) !== 'undefined') { %>
   <div class="sidebar-topic">
       <ul>
-        <li><a href='/user/<%= current_user.name %>/topics'>我的记录</a></li>
-        <li><a href='/user/<%= current_user.name %>/collections'>我的收藏</a></li>
+        <li><a href='/user/<%= current_user.name %>/topics'>我的记录本</a></li>
+        <li><a href='/user/<%= current_user.name %>/collections'>我的收藏本</a></li>
         <li><a href="">我的草稿</a></li>
       </ul>
   </div>
@@ -46,12 +46,12 @@
   
   <% if (typeof(site_links) !== 'undefined') { %>
   <div style="margin-left:10px;">
-    <div style="margin-bottom:5px;">
+    <div style="margin-bottom:10px;font-weight:700;">
       <span class='col_fade'>友情链接</span>
     </div>
     <div class='inner'>
       <% if (site_links.length > 0) { %>
-      <ol style="padding-left: 10px;">
+      <ol style="padding-left: 20px;">
         <%site_links.forEach(function (link) {%>
         <li><a href="<%-link.url%>"><%-link.text%></a></li>
         <%})%>
