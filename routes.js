@@ -126,5 +126,4 @@ module.exports = function (app) {
 
   // 个人记事本页面
   app.get('/records', auth.userRequired, user.records);
-
 };

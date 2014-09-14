@@ -68,7 +68,9 @@ exports.index = function (req, res, next) {
         $in: following
       };
     }
-    var options = { skip: (page - 1) * limit, limit: limit, sort: '-create_at' };
+    var options = { skip: (page - 1) * limit, limit: limit, sort: [
+      ['create_at', 'desc']
+    ]};
     Topic.getTopicsByQuery(query, options, function(err, topics) {
       var ep = new EventProxy();
       ep.after('like_ready', topics.length, function() {
@@ -148,8 +150,8 @@ exports.topics = function (req, res, next) {
   proxy.fail(next);
 
   // 取标签
-  TagModel.find({}, [], {sort: [
-    ['topic_count', 'asc']
+  TagModel.find({}, [], {limit: 20, sort: [
+    ['topic_count', 'desc']
   ], field: 'name topic_count'}, proxy.done('tags', function(tags) {
     return tags;
   }));
@@ -308,9 +310,7 @@ exports.search = function (req, res, next) {
     ] },
     proxy.done('no_reply_topics', function (no_reply_topics) {
       return no_reply_topics;
-  }));
-
-    
+  }));   
 };
 
 exports.tags = function (req, res, next) {

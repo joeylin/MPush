@@ -5,7 +5,7 @@
 var path = require('path');
 var pkg = require('./package.json');
 
-var debug = true;
+var debug = false;
 
 var config = {
   // debug 为 true 时，用于本地调试
@@ -25,7 +25,7 @@ var config = {
     // 格式 [ path, title, [target=''] ]
     // 例子 [ '/about', '关于' ],
   ],
-  // cdn host，如 http://cnodejs.qiniudn.com
+  // cdn host，如 http://valuenet.qiniudn.com
   site_static_host: '', // 静态文件存储域名
   // 社区的域名
   host: 'morepush.com',
@@ -101,15 +101,15 @@ var config = {
 
   // github 登陆的配置
   GITHUB_OAUTH: {
-    clientID: 'your GITHUB_CLIENT_ID',
-    clientSecret: 'your GITHUB_CLIENT_SECRET',
-    callbackURL: 'http://cnodejs.org/auth/github/callback',
+    clientID: '10bcbd067b991f5868df',
+    clientSecret: '9af5c00e0222599fc87bb04c1e4bb1ccff851efe',
+    callbackURL: 'http://morepush.com/auth/github/callback',
   },
   // 是否允许直接注册（否则只能走 github 的方式）
   allow_sign_up: true,
 
   // newrelic 是个用来监控网站性能的服务
-  newrelic_key: 'yourkey'
+  newrelic_key: 'c86d960ace9593a38b731c01c92c74d80ff9dbf5'
 };
 
 module.exports = config;

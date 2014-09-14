@@ -48,6 +48,7 @@ exports.getTopicById = function (id, callback) {
           s_topic.author_id = topic.author_id;
           s_topic.isForward = true;
           s_topic.real_id = topic._id;
+          s_topic.create_at = topic.create_at;
           proxy.emit('topic', s_topic);
         });
       });
