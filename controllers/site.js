@@ -227,11 +227,14 @@ exports.search = function (req, res, next) {
 
   // 取主题
   var query = {};
-  if(keyword && type === 'topic') {
-    query['$or'] = [
-      { title: new RegExp(keyword) },
-      { content: new RegExp(keyword) }
-    ];//模糊查询参数
+  if(type === 'topic') {
+    query['isPublic'] = true;
+    if (keyword) {
+      query['$or'] = [
+        { title: new RegExp(keyword) },
+        { content: new RegExp(keyword) }
+      ];//模糊查询参数
+    }
   }
   if (keyword && type === 'people') {
     query['name'] = new RegExp(keyword)
@@ -301,7 +304,6 @@ exports.search = function (req, res, next) {
       proxy.emit('pages', pages);
     }));
   }
-    
 
   // 取0回复的主题
   Topic.getTopicsByQuery(

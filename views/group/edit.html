@@ -1,0 +1,241 @@
+<div id='content' class="col-md-8 settings">
+  <div>
+    <div class='header'>
+      <ul class='breadcrumb'>
+        <li><a href='/'>主页</a></li>
+        <li class='active'>创建新分组</li>
+      </ul>
+    </div>
+    <div class='inner'>
+      <% if(typeof(error) !== 'undefined' && error){ %>
+      <div class="alert alert-danger">
+        <a class="close" data-dismiss="alert" href="#">&times;</a>
+        <strong><%= error %></strong>
+      </div>
+      <% } %>
+      <% if (typeof(success) !== 'undefined' && success) { %>
+      <div class="alert alert-success">
+        <strong><%= success %></strong>
+      </div>
+      <% } %>
+      <div class="row">
+        <div class="col-md-2 text-right">
+          <label>修改分组头像 :</label>
+        </div>
+        <div class="col-md-10">
+          <div class="media">
+            <span class="pull-left" style="margin-right:15px;">
+              <img src="<%= avatar_url %>" style="width:100px;height:100px;" class="avatar">
+            </span>
+            <div class="media-body">
+              <a id="editor-description-start-upload" class="btn btn-primary upload-btn">
+                选择头像
+                <input type="file" id="settings-upload-img" class="uploader-input">
+              </a>
+              <span class="upload_msg" id="settings-upload-msg">上传失败</span>
+              <div style="margin-top:10px;color:#999;font-size:0.9em;">支持 JPG、PNG、GIF 格式，不要超过 2M 。</div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <hr>
+      <form id='setting_form' class='form-horizontal' action='/setting' method='post'>
+        <div class='row'>
+          <div class="col-md-2 text-right">
+            <label for='name'>分组名 :</label>
+          </div>
+          <div class='col-md-5'>
+            <input class='form-control readonly' id='name' name='name' size='30' type='text' readonly='true' value="<%= name %>"/>
+          </div>
+        </div>
+
+        <div class='row'>
+          <div class="col-md-2 text-right">
+            <label for='url'>添加标签 :</label>
+          </div>
+          <div class='col-md-5'>
+            <% if(typeof(tags) !== 'undefined'){ %>
+            <input class='form-control' id='tags' name='tags' size='30' type='text' value="<%= tags %>"/>
+            <% }else{ %>
+            <input class='form-control' id='tags' name='tags' size='30' type='text' value=''/>
+            <% } %>
+          </div>
+        </div>
+
+        <div class='row'>
+          <div class="col-md-2 text-right">
+            <label for='signature'>描述 :</label>
+          </div>
+          <div class='col-md-8'>
+            <% if(typeof(des) !== 'undefined'){ %>
+            <textarea class='form-control' id='des' name='des' size='30'><%= des
+              %></textarea>
+            <% }else{ %>
+            <textarea class='form-control' id='des' name='des' size='30'></textarea>
+            <% } %>
+          </div>
+        </div>
+        <input type='hidden' id='action' name='action' value='change_setting'/>
+        <input type='hidden' name='_csrf' value='<%= csrf %>'/>
+
+        <div class='form-actions row'>
+          <div class="col-md-offset-2 col-md-5">
+            <input type='submit' class='span-primary submit_btn' data-loading-text="保存中.." value='保存设置'/>
+          </div>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+<%- partial('../sidebar') %>
+<!-- qiniu editor -->
+<%- Loader('/public/topic_edit.min.js')
+.js('/public/libs/qiniu.uploader.js')
+.done(assets, config.site_static_host, config.mini_assets)
+%>
+<script>
+  $(document).ready(function () {
+    var $msg = $('#settings-upload-msg');
+    initQiniuUploader({
+      input: 'settings-upload-img',
+      progress: function (p, s, n) {
+        var title = '进度 : ' + p + '%';
+        $msg.removeClass('error');
+        $msg.removeClass('success');
+        $msg.css({display:'inline-block'});
+        $msg.text(title);
+      },
+      putFailure: function (msg) {
+        $msg.removeClass('success');
+        $msg.addClass('error').text('上传失败');
+      },
+      putFinished: function (fsize, res, taking) {
+        // res.key
+        var url = '//' + res.host + '/' + res.key;
+        url = url + '-normal2';
+        var img = new Image();
+        img.src = url;
+        $msg.text('正在处理...');
+        img.onload = function() {
+          $msg.text('上传成功。');
+          $msg.addClass('success');
+          $('.avatar').attr('src', url);
+        };
+        var data = {
+          avatar: url
+        };
+        $.post('/api/setting/avatar', data, function(data) {
+          console.log(data.avatar);
+        });
+      }
+    });
+    
+    // 初始化七牛上传组件
+    function initQiniuUploader (options) {
+
+      // 生成上传文件名
+      function genKey () {
+        function n2 (n) { return (n < 10 ? '0' : '') + n; }
+        var d = new Date();
+        return [d.getFullYear(), n2(d.getMonth() + 1), n2(d.getDate()), randomString(32)].join('/');
+      }
+
+      // 生成随机字符串
+      function randomString (size) {
+        size = size || 6;
+        var code_string = 'abcdefghijklmnopqrstuvwxyz0123456789';
+        var max_num = code_string.length + 1;
+        var new_pass = '';
+        while (size > 0) {
+          new_pass += code_string.charAt(Math.floor(Math.random() * max_num));
+          size--;
+        }
+        return new_pass;
+      }
+
+      // 待上传文件列表
+
+      //设置颁发token的Url,该Url返回的token用于后续的文件上传
+      //Q.SignUrl('/uploads/token');
+      //可以在此回调中添加提交至服务端的额外参数,用于生成上传token
+      //此函数会在上传前被调用
+      if (options.beforeUp) Q.addEvent('beforeUp', options.beforeUp);
+      //上传进度回调
+      //@p, 0~100
+      //@s, 已格式化的速度
+      //if (options.progress) Q.addEvent('progress', options.progress);
+      //上传失败回调
+      //@msg, 失败消息
+      //if (options.putFailure) Q.addEvent('putFailure', options.putFailure);
+      //上传完成回调
+      //@fsize, 文件大小(MB)
+      //@res, 上传返回结果，默认为{hash:<hash>,key:<key>}
+      //@taking, 上传使用的时间
+      //if (options.putFinished) Q.addEvent('putFinished', options.putFinished);
+      //发现待发上传的文件是未完成的事件
+      //@his,文件名
+      if (options.historyFound) Q.addEvent('historyFound', options.historyFound);
+
+      // 上传队列
+      var uploadQueue = [];
+      // 正在上传的文件
+      var currentFile;
+
+      // 开始上传
+      function startUpload () {
+        if (!bucketHost) {
+          console.log('wait for upload token...');
+          return;
+        }
+        var item = uploadQueue.shift();
+        if (item) {
+          console.log('uploading...', item.f, item.k);
+          currentFile = item.f;
+          Q.Upload(item.f, item.k);
+        }
+      }
+      Q.addEvent('putFailure', function (msg) {
+        startUpload();
+        if (options.putFailure) {
+          options.putFailure(msg);
+        }
+      });
+      Q.addEvent('putFinished', function (fsize, res, taking) {
+        startUpload();
+        if (options.putFinished) {
+          res.host = bucketHost;
+          options.putFinished(fsize, res, taking);
+        }
+      });
+      Q.addEvent('progress', function (p, s) {
+        if (options.progress) {
+          var n = currentFile.name;
+          options.progress(p, s, n);
+        }
+      });
+
+      // 获取上传Token
+      var bucketHost;
+      $.post('/api/token.json', function (d) {
+        Q.SetToken(d.token);
+        bucketHost = d.host;
+        startUpload();
+      }, 'json');
+
+      // 监听选择文件事件
+      $('#' + options.input).change(function () {
+        var files = document.getElementById(options.input).files;
+        if (files && files.length) {
+          for (var i = 0; i < files.length; i++) {
+            var f = files[i];
+            var k = genKey();
+            uploadQueue.push({f: f, k: k});
+          }
+          startUpload();
+        }
+      });
+    }
+    window.initQiniuUploader = initQiniuUploader;
+  });
+  /****************************************************************************/
+</script>

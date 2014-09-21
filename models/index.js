@@ -19,6 +19,8 @@ require('./tag_collect');
 require('./relation');
 require('./message');
 require('./like');
+require('./group');
+require('./group_follow');
 
 exports.Tag = mongoose.model('Tag');
 exports.User = mongoose.model('User');
@@ -30,3 +32,5 @@ exports.TagCollect = mongoose.model('TagCollect');
 exports.Relation = mongoose.model('Relation');
 exports.Message = mongoose.model('Message');
 exports.Like = mongoose.model('Like');
+exports.Group = mongoose.model('Group');
+exports.GroupFollow = mongoose.model('GroupFollow');
