@@ -53,8 +53,8 @@ exports.index = function (req, res, next) {
     proxy.assign('recent_topics', 'recent_replies', 'relation', render);
     proxy.fail(next);
 
-    var query = {author_id: user._id};
-    var opt = {limit: 5, sort: [
+    var query = {author_id: user._id, isPublic: true};
+    var opt = {limit: 10, sort: [
       ['create_at', 'desc']
     ]};
     Topic.getTopicsByQuery(query, opt, proxy.done('recent_topics'));
@@ -118,7 +118,7 @@ exports.profile = function (req, res, next) {
     proxy.assign('recent_topics', 'recent_replies', 'relation', render);
     proxy.fail(next);
 
-    var query = {author_id: user._id};
+    var query = {author_id: user._id, isPublic: true};
     var opt = {limit: 5, sort: [
       ['create_at', 'desc']
     ]};
@@ -535,51 +535,6 @@ exports.top100 = function (req, res, next) {
   });
 };
 
-exports.records = function(req, res, next) {
-  var user_name = req.params.name;
-  var page = Number(req.query.page) || 1;
-  var limit = config.list_topic_count;
-
-  User.getUserByName(user_name, function (err, user) {
-    if (!user) {
-      res.render('notify/notify', {error: '这个用户不存在。'});
-      return;
-    }
-
-    var render = function (topics, relation, pages) {
-      user.friendly_create_at = Util.format_date(user.create_at, true);
-      res.render('user/topics', {
-        user: user,
-        topics: topics,
-        relation: relation,
-        current_page: page,
-        pages: pages
-      });
-    };
-
-    var proxy = new EventProxy();
-    proxy.assign('topics', 'relation', 'pages', render);
-    proxy.fail(next);
-
-    var query = {'author_id': user._id};
-    var opt = {skip: (page - 1) * limit, limit: limit, sort: [
-      ['create_at', 'desc']
-    ]};
-    Topic.getTopicsByQuery(query, opt, proxy.done('topics'));
-
-    if (!req.session.user) {
-      proxy.emit('relation', null);
-    } else {
-      Relation.getRelation(req.session.user._id, user._id, proxy.done('relation'));
-    }
-
-    Topic.getCountByQuery(query, proxy.done(function (all_topics_count) {
-      var pages = Math.ceil(all_topics_count / limit);
-      proxy.emit('pages', pages);
-    }));
-  });
-};
-
 exports.list_topics = function (req, res, next) {
   var user_name = req.params.name;
   var page = Number(req.query.page) || 1;
@@ -623,6 +578,108 @@ exports.list_topics = function (req, res, next) {
       proxy.emit('pages', pages);
     }));
   });
+};
+
+exports.records = function (req, res, next) {
+  var page = parseInt(req.query.page, 10) || 1;
+  page = page > 0 ? page : 1;
+  var user = req.session.user;
+  var limit = config.list_topic_count;
+
+  var proxy = EventProxy.create('topics', 'no_reply_topics', 'pages',
+    function (topics, no_reply_topics, pages) {   
+      res.render('my_records', {
+        topics: topics,
+        current_page: page,
+        list_topic_count: limit,
+        no_reply_topics: no_reply_topics,
+        pages: pages,
+        records: true,
+        title: '我的记录本',
+        site_links: config.site_links,
+        home: true
+      });
+    });
+  proxy.fail(next);
+
+  // 取主题
+  var query = {'author_id': user._id};
+  var options = { skip: (page - 1) * limit, limit: limit, sort: [
+    ['create_at', 'desc']
+  ]};
+  Topic.getTopicsByQuery(query, options, function(err, topics) {
+    proxy.emit('topics', topics);      
+  });
+
+  // 取分页数据
+  Topic.getCountByQuery(query, proxy.done(function (all_topics_count) {
+    var pages = Math.ceil(all_topics_count / limit);
+    proxy.emit('pages', pages);
+  }));
+
+  // 取0回复的主题
+  Topic.getTopicsByQuery(
+    { reply_count: 0 },
+    { limit: 5, sort: [
+      [ 'create_at', 'desc' ]
+    ] },
+    proxy.done('no_reply_topics', function (no_reply_topics) {
+      return no_reply_topics;
+  }));
+};
+
+exports.collections = function (req, res, next) {
+  var page = parseInt(req.query.page, 10) || 1;
+  page = page > 0 ? page : 1;
+  var user = req.session.user;
+  var limit = config.list_topic_count;
+
+  var proxy = EventProxy.create('topics', 'no_reply_topics', 'pages',
+    function (topics, no_reply_topics, pages) {   
+      res.render('my_records', {
+        topics: topics,
+        current_page: page,
+        list_topic_count: limit,
+        no_reply_topics: no_reply_topics,
+        pages: pages,
+        collections: true,
+        title: '我的收藏本',
+        site_links: config.site_links,
+        home: true
+      });
+    });
+  proxy.fail(next);
+
+  // 取主题
+  TopicCollect.getTopicCollectsByUserId(user._id, proxy.done(function (docs) {
+    var ids = [];
+    for (var i = 0; i < docs.length; i++) {
+      ids.push(docs[i].topic_id);
+    }
+    var query = { _id: { '$in': ids } };
+    var opt = {
+      skip: (page - 1) * limit,
+      limit: limit,
+      sort: [
+        [ 'create_at', 'desc' ]
+      ]
+    };
+    Topic.getTopicsByQuery(query, opt, proxy.done('topics'));
+    Topic.getCountByQuery(query, proxy.done(function (all_topics_count) {
+      var pages = Math.ceil(all_topics_count / limit);
+      proxy.emit('pages', pages);
+    }));
+  }));
+
+  // 取0回复的主题
+  Topic.getTopicsByQuery(
+    { reply_count: 0 },
+    { limit: 5, sort: [
+      [ 'create_at', 'desc' ]
+    ] },
+    proxy.done('no_reply_topics', function (no_reply_topics) {
+      return no_reply_topics;
+  }));
 };
 
 exports.list_replies = function (req, res, next) {

@@ -65,26 +65,12 @@
 
   <div>
     <div class='header'>
-      <h4>最近创建的记录</h4>
+      <h4>Ta的记录</h4>
     </div>
     <% if (typeof(recent_topics) !== 'undefined' && recent_topics.length > 0) { %>
     <%- partial('../topic/item', { collection: recent_topics, as: 'topic' }) %>
     <div class='clearfix'>
       <a class='profile-more' href="/user/<%= user.name %>/topics">查看更多>></a>
-    </div>
-    <% } else { %>
-    <p>无话题</p>
-    <% } %>
-  </div>
-
-  <div>
-    <div class='header'>
-      <h4>最近参与讨论的记录</h4>
-    </div>
-    <% if (typeof(recent_replies) !== 'undefined' && recent_replies.length > 0) { %>
-    <%- partial('../topic/item', { collection: recent_replies, as: 'topic' }) %>
-    <div class='clearfix'>
-      <a class='profile-more' href="/user/<%= user.name %>/replies">查看更多>></a>
     </div>
     <% } else { %>
     <p>无话题</p>

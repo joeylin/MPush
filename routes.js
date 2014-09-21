@@ -58,8 +58,10 @@ module.exports = function (app) {
   app.post('/setting', auth.signinRequired, user.setting); // 提交个人信息设置
   app.get('/stars', auth.signinRequired, user.show_stars); // 显示所有达人列表页
   app.get('/users/top100', auth.signinRequired, user.top100);  // 显示积分前一百用户页
-  app.get('/user/:name/collections', auth.signinRequired, user.get_collect_topics);  // 用户收藏的所有话题页
+  // app.get('/user/:name/collections', auth.signinRequired, user.get_collect_topics);  // 用户收藏的所有话题页
   app.get('/my/messages', auth.signinRequired, message.index); // 用户个人的所有消息页
+  app.get('/my/topics', auth.signinRequired, user.records); // 用户个人的记录本
+  app.get('/my/collections', auth.signinRequired, user.collections); // 用户个人的收藏本
   app.get('/user/:name/follower', auth.signinRequired, user.get_followers);  // 用户的粉丝页
   app.get('/user/:name/following', auth.signinRequired, auth.signinRequired, user.get_followings);  // 用户关注的对象页
   app.get('/user/:name/topics', auth.signinRequired, user.list_topics);  // 用户发布的所有话题页
@@ -124,6 +126,4 @@ module.exports = function (app) {
   app.get('/tags', auth.userRequired, site.tags);
   app.get('/tags/:tag', auth.userRequired, site.tag);
 
-  // 个人记事本页面
-  app.get('/records', auth.userRequired, user.records);
 };

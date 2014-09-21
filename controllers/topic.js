@@ -178,7 +178,7 @@ exports.put = function (req, res, next) {
 };
 exports.pagePut = function (req, res, next) {
   var content = req.body.t_content || '';
-  var isPublic = !!parseInt(req.body.isPublic);
+  var isPublic = !!parseInt(req.body.isPublic, 10);
   var topic_tags = [];
   if (req.body.topic_tags !== '') {
     topic_tags = req.body.topic_tags.split(',');

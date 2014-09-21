@@ -157,10 +157,11 @@ exports.topics = function (req, res, next) {
   }));
 
   // 取主题
+  var query = {isPublic: true};
   var options = { skip: (page - 1) * limit, limit: limit, sort: [
     ['create_at', 'desc' ]
   ] };
-  Topic.getTopicsByQuery({}, options, function(err, topics) {
+  Topic.getTopicsByQuery(query, options, function(err, topics) {
     var ep = new EventProxy();
     ep.after('like_ready', topics.length, function() {
       var ep1 = new EventProxy();
@@ -197,7 +198,7 @@ exports.topics = function (req, res, next) {
   }));
 
   // 取分页数据
-  Topic.getCountByQuery({}, proxy.done(function (all_topics_count) {
+  Topic.getCountByQuery(query, proxy.done(function (all_topics_count) {
     var pages = Math.ceil(all_topics_count / limit);
     proxy.emit('pages', pages);
   }));

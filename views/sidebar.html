@@ -36,9 +36,9 @@
   <% if (typeof(current_user) !== 'undefined' && typeof(home) !== 'undefined') { %>
   <div class="sidebar-topic">
       <ul>
-        <li><a href='/user/<%= current_user.name %>/topics'>我的记录本</a></li>
-        <li><a href='/user/<%= current_user.name %>/collections'>我的收藏本</a></li>
-        <li><a href="">我的草稿</a></li>
+        <li class="<%= typeof(records) !== 'undefined' ? 'active' : '' %>"><a href='/my/topics'>我的记录本</a></li>
+        <li class="<%= typeof(collections) !== 'undefined' ? 'active' : '' %>"><a href='/my/collections'>我的收藏本</a></li>
+        <li class="<%= typeof(draft) !== 'undefined' ? 'active' : '' %>"><a href="">我的草稿</a></li>
       </ul>
   </div>
   <hr>

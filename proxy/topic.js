@@ -251,7 +251,7 @@ exports.newAndSave = function (title, tags, isPublic, content, authorId, callbac
   topic.title = title;
   topic.content = content;
   topic.tags = tags;
-  topic.isPublic = isPublic || true;
+  topic.isPublic = isPublic;
   topic.author_id = authorId;
   topic.save(callback);
 };

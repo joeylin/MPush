@@ -4,6 +4,7 @@
         <a href="/user/<%= topic.author.name %>">
           <img src="<%= topic.author.avatar_url %>" title="<%= topic.author.name %>" style="width:40px;height:40px;" />
         </a>
+        <% if (topic.isPublic) { %>
         <div class="vote-wrap">
             <div class="vote">
                 <button class="vote-down" title="赞同数">
@@ -11,6 +12,10 @@
                 </button>
             </div> 
         </div>
+        <% } else { %>
+        <!-- 标记为隐私 -->
+        <span class="privite">私密</span>
+        <% } %>
     </span>
     <div class="media-body">
         <div class="record-title">
@@ -33,6 +38,8 @@
         </div>
         <div class="media-info clearfix">
             <span class="date"><%= topic.friendly_create_at %></span>
+            <% if (topic.isPublic) { %>
+            <!-- 公开记录的操作 -->
             <span class="forward"> 转发</span>
             <% if (topic.in_collection) { %>
             <span class="collect" action="de_collect"> 取消收藏</span>
@@ -47,6 +54,8 @@
             <span class="like"> 赞</span>
             <% } %>
             
+            <% } %>
+
             <span class="h-reply-btn"> <span class="flag">讨论</span>(<span class="reply-conut"><%= topic.reply_count %></span>)</span>
             <span class="pull-right close-content">收起内容</span>
         </div>
