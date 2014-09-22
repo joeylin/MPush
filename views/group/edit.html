@@ -3,7 +3,12 @@
     <div class='header'>
       <ul class='breadcrumb'>
         <li><a href='/'>主页</a></li>
+        <% if(typeof(action) !== 'undefined' && action == 'edit'){ %>
+        <li class='active'>编辑 <%= name %> 分组</li>
+        <% }else{ %>
         <li class='active'>创建新分组</li>
+        <% } %>
+        
       </ul>
     </div>
     <div class='inner'>
@@ -18,14 +23,16 @@
         <strong><%= success %></strong>
       </div>
       <% } %>
+
+      <% if (typeof(action) !== 'undefined' && action === 'edit') { %>
       <div class="row">
         <div class="col-md-2 text-right">
-          <label>修改分组头像 :</label>
+          <label>分组头像 :</label>
         </div>
         <div class="col-md-10">
           <div class="media">
             <span class="pull-left" style="margin-right:15px;">
-              <img src="<%= avatar_url %>" style="width:100px;height:100px;" class="avatar">
+              <img src="<%= avatar + '-100' %>" style="width:100px;height:100px;" class="avatar">
             </span>
             <div class="media-body">
               <a id="editor-description-start-upload" class="btn btn-primary upload-btn">
@@ -39,19 +46,30 @@
         </div>
       </div>
       <hr>
-      <form id='setting_form' class='form-horizontal' action='/setting' method='post'>
+      <% } %>
+
+      <% if (typeof(action) !== 'undefined' && action === 'edit') { %>
+      <form id='setting_form' class='form-horizontal' action='/group/<%= group_id %>/edit' method='post'>
+      <% }else{ %>
+      <form id='setting_form' class='form-horizontal' action='/group/create' method='post'>
+      <% } %>
+      
         <div class='row'>
           <div class="col-md-2 text-right">
             <label for='name'>分组名 :</label>
           </div>
           <div class='col-md-5'>
+            <% if(typeof(name) !== 'undefined'){ %>
             <input class='form-control readonly' id='name' name='name' size='30' type='text' readonly='true' value="<%= name %>"/>
+            <% }else{ %>
+            <input class='form-control' id='name' name='name' size='30' type='text' value=""/>
+            <% } %>
           </div>
         </div>
 
         <div class='row'>
           <div class="col-md-2 text-right">
-            <label for='url'>添加标签 :</label>
+            <label for='tags'>添加标签 :</label>
           </div>
           <div class='col-md-5'>
             <% if(typeof(tags) !== 'undefined'){ %>
@@ -67,11 +85,11 @@
             <label for='signature'>描述 :</label>
           </div>
           <div class='col-md-8'>
-            <% if(typeof(des) !== 'undefined'){ %>
-            <textarea class='form-control' id='des' name='des' size='30'><%= des
+            <% if(typeof(desc) !== 'undefined'){ %>
+            <textarea class='form-control' id='desc' name='desc' size='30'><%= desc
               %></textarea>
             <% }else{ %>
-            <textarea class='form-control' id='des' name='des' size='30'></textarea>
+            <textarea class='form-control' id='desc' name='desc' size='30'></textarea>
             <% } %>
           </div>
         </div>
@@ -87,7 +105,8 @@
     </div>
   </div>
 </div>
-<%- partial('../sidebar') %>
+
+<% if (typeof(action) !== 'undefined' && action === 'edit') { %>
 <!-- qiniu editor -->
 <%- Loader('/public/topic_edit.min.js')
 .js('/public/libs/qiniu.uploader.js')
@@ -122,9 +141,10 @@
           $('.avatar').attr('src', url);
         };
         var data = {
-          avatar: url
+          avatar: url,
+          group_id: <%= group_id %>
         };
-        $.post('/api/setting/avatar', data, function(data) {
+        $.post('/api/group/avatar', data, function(data) {
           console.log(data.avatar);
         });
       }
@@ -239,3 +259,5 @@
   });
   /****************************************************************************/
 </script>
+
+<% } %>

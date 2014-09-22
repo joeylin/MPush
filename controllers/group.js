@@ -35,6 +35,7 @@ exports.index = function (req, res, next) {
       error: '此分组不存在。'
     });
   }
+
   var events = ['group', 'follow', 'most_active_users'];
   var ep = EventProxy.create(events, function (group, follow, most_active_users) {
     res.render('group/index', {
@@ -46,10 +47,10 @@ exports.index = function (req, res, next) {
 
   ep.fail(next);
 
-  Group.getGroup(group_id, ep.done(function (message, group) {
-    if (message || !group) {
+  Group.getGroupById(group_id, function(err, group) {
+    if (err || !group) {
       ep.unbind();
-      return res.render('notify/notify', { error: message });
+      return res.render('notify/notify', { error: err.msg });
     }
 
     group.friendly_create_at = Util.format_date(group.create_at, true);
@@ -76,12 +77,88 @@ exports.index = function (req, res, next) {
     // var query = { author_id: topic.author_id, _id: { '$nin': [ topic._id ] } };
     // User.getTopicsByQuery(query, options, ep.done('most_active_users'));
     ep.emit('most_active_users', []);
-
-  }));
+  });
 };
 
 exports.create = function (req, res, next) {
-  res.render('group/edit', {isPublic: true});
+  if (!req.session.user) {
+    res.redirect('/');
+    return;
+  }
+  res.render('group/edit', {avatar:'http://valuenet.qiniudn.com/group-avatar.png'});
+};
+
+exports.put = function (req, res, next) {
+  if (!req.session.user) {
+    res.redirect('/');
+    return;
+  }
+
+  // 显示出错或成功信息
+  function showMessage(msg, data, isSuccess) {
+    var data = data || req.body;
+    var data2 = {
+      name: data.name,
+      desc: data.desc,
+      tags: data.tags,
+      avatar: data.avatar || 'http://valuenet.qiniudn.com/group-avatar.png'
+    };
+    if (isSuccess) {
+      data2.success = msg;
+    } else {
+      data2.error = msg;
+    }
+    res.render('group/edit', data2);
+  }
+
+  // post
+  var name = sanitize(req.body.name).trim();
+  name = sanitize(name).xss();
+  var tags = sanitize(req.body.tags).trim();
+  tags = sanitize(tags).xss();
+  var desc = sanitize(req.body.desc).trim();
+  desc = sanitize(desc).xss();
+
+  if (!name) {
+    showMessage('分组名没有填写');
+  }
+  if (!tags) {
+    showMessage('标签不能为空');
+  }
+  if (!desc) {
+    showMessage('请填写描述');
+  }
+  console.log(Group);
+  Group.newAndSave(name, desc, tags, function (err, group) {
+    if (err) {
+      return next(err);
+    }
+    res.redirect('/group/' + group._id);
+  });
+};
+
+exports.ajax_avatar = function(req, res, next) {
+  if (!req.session.user) {
+    res.send({
+      code: 404,
+      info: '还未登录'
+    });
+    return;
+  }
+  var url = req.body.avatar;
+  var group_id = req.body.group_id;
+  Group.getGroupById(group_id, function(err, group) {
+    if (err) {
+      return next(err);
+    }
+    group.avatar = url;
+    group.save(function(err) {
+      res.send({
+        code: 200,
+        avatar: group.avatar
+      });
+    });
+  });
 };
 
 exports.showEdit = function (req, res, next) {
@@ -92,17 +169,16 @@ exports.showEdit = function (req, res, next) {
 
   var group_id = req.params.gid;
   if (group_id.length !== 24) {
-    res.render('notify/notify', {error: '此话题不存在或已被删除。'});
+    res.render('notify/notify', {error: '此分组不存在或已被删除。'});
     return;
   }
-  Topic.getTopicById(group_id, function (err, topic, tags) {
-    if (!topic) {
-      res.render('notify/notify', {error: '此话题不存在或已被删除。'});
+  Group.getGroupById(group_id, function (err, group) {
+    if (!group) {
+      res.render('notify/notify', {error: '此分组不存在或已被删除。'});
       return;
     }
-    if (String(topic.author_id) === req.session.user._id || req.session.user.is_admin) {
-      
-      res.render('topic/edit', {action: 'edit', group_id: topic._id, title: topic.title, content: topic.content, tags: topic.tags, isPublic: topic.isPublic});
+    if (!req.session.user.is_admin) {
+      res.render('group/edit', {action: 'edit', group_id: group._id, name: group.name, desc: group.desc, tags: group.tags, avatar: group.avatar});
     } else {
       res.render('notify/notify', {error: '对不起，你不能编辑此话题。'});
     }
@@ -250,7 +326,7 @@ exports.delete = function (req, res, next) {
   });
 };
 
-exports.folllow = function (req, res, next) {
+exports.follow = function (req, res, next) {
   var group_id = req.body.group_id;
   Topic.getTopic(group_id, function (err, topic) {
     if (err) {

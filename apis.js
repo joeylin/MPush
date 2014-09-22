@@ -8,6 +8,7 @@ var user = require('./controllers/user');
 var message = require('./controllers/message');
 var topic = require('./controllers/topic');
 var reply = require('./controllers/reply');
+var group = require('./controllers/group');
 var rss = require('./controllers/rss');
 var assets = require('./controllers/static');
 var tools = require('./controllers/tools');
@@ -44,6 +45,9 @@ module.exports = function (app) {
 	app.post('/api/topic/:topic_id/ajaxReply', auth.userRequired, limit.postInterval, reply.ajax_add);
 	app.post('/api/topic/:topic_id/ajaxReply2', auth.userRequired, limit.postInterval, reply.ajax_add_reply2);
 	app.post('/api/setting/avatar', auth.userRequired, user.ajax_avatar);
+
+	// group
+	app.post('/api/group/avatar', auth.userRequired, group.ajax_avatar);
 
 	// token
 	app.post('/api/token.json', auth.userRequired, getUploadToken);

@@ -8,3 +8,5 @@ exports.Relation = require('./relation');
 exports.TagCollect = require('./tag_collect');
 exports.TopicTag = require('./topic_tag');
 exports.TopicCollect = require('./topic_collect');
+exports.Group = require('./group');
+exports.GroupFollow = require('./group_follow');

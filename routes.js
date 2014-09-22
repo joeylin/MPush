@@ -11,6 +11,7 @@
 var sign = require('./controllers/sign');
 var site = require('./controllers/site');
 var user = require('./controllers/user');
+var group = require('./controllers/group');
 var message = require('./controllers/message');
 var topic = require('./controllers/topic');
 var reply = require('./controllers/reply');
@@ -91,6 +92,16 @@ module.exports = function (app) {
   app.post('/topic/:tid/edit', topic.update);
   app.post('/topic/collect', auth.userRequired, topic.collect); // 关注某话题
   app.post('/topic/de_collect', auth.userRequired, topic.de_collect); // 取消关注某话题
+
+  // 新建分组界面
+  app.get('/group/create', auth.signinRequired, group.create);
+  app.get('/group/:gid', group.index);  // 显示某个话题
+
+  // 创建新分组
+  app.post('/group/create', auth.signinRequired, limit.postInterval, group.put);
+  app.post('/group/:gid/edit', group.update);
+  app.post('/group/follow', auth.userRequired, group.follow); // 关注某分组
+  app.post('/group/unfollow', auth.userRequired, group.unfollow); // 取消关注某分组
 
   // reply
   // 回复
