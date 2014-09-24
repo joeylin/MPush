@@ -274,13 +274,6 @@ exports.forward = function(user_id, topic_id, callback) {
     }
     t.isForward = true;
     t.save(callback);
-  });
-      
+  });      
 };
 
-Topic.findOne({_id: '54182423819df2a4440036a2'}, function(err, topic) {
-  if (topic) {
-    console.log(topic);
-    topic.remove();
-  }
-});
